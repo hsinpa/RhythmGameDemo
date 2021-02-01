@@ -11,5 +11,9 @@ namespace Hsinpa {
 
 
         }
+
+        public enum SnakePathType {
+            Point, ControlPoint
+        }
     }
 }
