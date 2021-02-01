@@ -72,18 +72,27 @@ namespace Hsinpa.Creator
 
 
                 for (int i = 0; i < creator.snakePath.PointCount; i++) {
-                    Handles.color = Color.red;
+                    Handles.color = (i % 3 == 0) ? Color.red : Color.blue;
 
                     Vector3 newPos = Handles.FreeMoveHandle(creator.snakePath[i], Quaternion.identity, .2f, _snap, Handles.CylinderHandleCap);
 
-                    if (creator.snakePath[i] != newPos)
+                    if (creator.snakePath[i] != newPos && (!creator.enableAutoContorlPoint || (creator.enableAutoContorlPoint && i % 3 == 0)))
                     {
                         Undo.RecordObject(creator, "Move point");
 
                         creator.snakePath.Update(newPos, i);
+
+                        if (creator.enableAutoContorlPoint) {
+                            AutoSetControlPointIfEnable(i);
+                        }
+
                     }
                 }
             }
+        }
+
+        void AutoSetControlPointIfEnable(int index) {
+            creator.SmoothCtrlPoints(index - 3, index + 3);
         }
 
         void OnEnable()

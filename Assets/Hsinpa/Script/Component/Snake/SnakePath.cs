@@ -88,7 +88,10 @@ namespace Hsinpa.Snake {
                     Points[correspondingControlIndex] = Points[anchorIndex] + dir * dst;
                 }
             }
+        }
 
+        public void ForceUpdate(Vector3 position, int index) {
+            Points[index] = position;
         }
 
         public void Insert(Vector3 position, int index) {

@@ -16,6 +16,9 @@ namespace Hsinpa.Creator {
             set
             {
                 _enableAutoCtrlPoint = value;
+
+                if (_enableAutoCtrlPoint)
+                    SmoothCtrlPoints(0, snakePath.PointCount);
             }
         }
 
@@ -41,6 +44,24 @@ namespace Hsinpa.Creator {
 
             _snakePath.AddSegment(new Vector3(0, 0, 3));
         }
+
+        public void SmoothCtrlPoints(int startIndex, int endIndex) {
+
+            for (int i = startIndex; i <= endIndex; i += 3 )
+            {
+                if (i <= 0 || i >= snakePath.PointCount - 1 || i % 3 != 0) continue;
+
+                Vector3 anchorFaceDir = (snakePath[i + 3] - snakePath[i - 3]).normalized;
+                float halfPreviousDist = Vector3.Distance(snakePath[i - 3], snakePath[i]) * 0.5f;
+                float halfForwardDist = Vector3.Distance(snakePath[i + 3], snakePath[i]) * 0.5f;
+
+                //Debug.Log($"index {i},halfPreviousDist {halfPreviousDist}, halfForwardDist {halfForwardDist}");
+
+                snakePath.ForceUpdate(snakePath[i] - (anchorFaceDir * halfPreviousDist), (i - 1));
+                snakePath.ForceUpdate(snakePath[i] + (anchorFaceDir * halfForwardDist), (i + 1));
+            }
+        }
+
 
 
     }
