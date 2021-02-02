@@ -100,6 +100,11 @@ namespace Hsinpa.Snake {
             Points.Insert(index, position);
         }
 
+        public void SplitSegment(Vector3 newAnchorPos, int segmentIndex) {
+            //Control anchor need re position
+            Points.InsertRange(segmentIndex * 3 + 2, new Vector3[] { Vector3.zero, newAnchorPos, Vector3.zero });
+        }
+
         public void Push(Vector3 position) {
             Points.Add(position);
         }

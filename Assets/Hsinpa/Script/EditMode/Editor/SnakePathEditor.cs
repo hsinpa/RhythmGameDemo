@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using Hsinpa.Snake;
+using Hsinpa.Utility;
+using UnityEngine.SceneManagement;
 
 namespace Hsinpa.Creator
 {
@@ -13,6 +15,11 @@ namespace Hsinpa.Creator
         Tool LastTool = Tool.None;
 
         Vector3 _snap = Vector3.one * 0.5f;
+        float minBezierDistThreshold = 0.5f;
+        //When minBezierDistThreshold fail, use this to check lastBezierSegmentInfo
+        float minRecordBezierDistThreshold = 1f;
+
+        BezierSegmentInfo lastBezierSegmentInfo;
 
         public override void OnInspectorGUI()
         {
@@ -76,7 +83,32 @@ namespace Hsinpa.Creator
                 }
             }
 
+            if (guiEvent.type == EventType.MouseMove && guiEvent.control)
+            {
+                lastBezierSegmentInfo = FindClosestSegment(mousePos, direction);
 
+                if (lastBezierSegmentInfo.SegmentIndex >= 0)
+                {
+                    //Debug.Log($"SegmentIndex {lastBezierSegmentInfo.SegmentIndex}, t {lastBezierSegmentInfo.t}, dist {lastBezierSegmentInfo.dist}");
+                    SceneView.RepaintAll();
+                }
+
+            }
+
+
+            if (guiEvent.type == EventType.MouseDown && guiEvent.button == 0 && guiEvent.control) {
+                if (lastBezierSegmentInfo.SegmentIndex >= 0)
+                {
+                    creator.snakePath.SplitSegment(lastBezierSegmentInfo.position, lastBezierSegmentInfo.SegmentIndex);
+
+                    int anchorIndex = lastBezierSegmentInfo.SegmentIndex * 3;
+                    creator.SmoothCtrlPoints(anchorIndex -3, anchorIndex+3);
+                    SceneView.RepaintAll();
+                }
+            }
+
+            if (!guiEvent.control)
+                lastBezierSegmentInfo.SegmentIndex = -1;
         }
 
         void Draw(Event guiEvent) {
@@ -89,7 +121,15 @@ namespace Hsinpa.Creator
                     Handles.color = Color.black;
                     Handles.DrawLine(points[1], points[0]);
                     Handles.DrawLine(points[2], points[3]);
-                    Handles.DrawBezier(points[0], points[3], points[1], points[2], Color.green, null, 2);
+
+                    Color bezierColor = (i == lastBezierSegmentInfo.SegmentIndex) ? Color.yellow : Color.green;
+
+                    if (i == lastBezierSegmentInfo.SegmentIndex) {
+                        Handles.color = Color.red;
+                        Handles.SphereHandleCap(0, lastBezierSegmentInfo.position, Quaternion.identity, 0.1f, EventType.Repaint);
+                    }
+
+                    Handles.DrawBezier(points[0], points[3], points[1], points[2], bezierColor, null, 2);
                 }
 
 
@@ -137,9 +177,57 @@ namespace Hsinpa.Creator
                 }
             }
 
-
             return clostetIndex;
         }
+
+        BezierSegmentInfo FindClosestSegment(Vector3 mousePos, Vector3 mouseDir) {
+            Vector3 recordBezierCurveDot = Vector3.zero;
+
+            for (int i = 0; i < creator.snakePath.NumSegments; i++)
+            {
+                Vector3[] points = creator.snakePath.GetPointsInSegment(i);
+
+                float dist = 10;
+                float record_t = 0;
+
+                for (float t = 0; t <= 1; t += 0.1f)
+                {
+                    Vector3 bezierCurveDot = SnakeUtility.BezierCurve(points[0], points[1], points[2], points[3], t);
+                    float distToCamera = (bezierCurveDot - mousePos).magnitude;
+                    Vector3 simulateMousePoint = mousePos + (mouseDir * distToCamera);
+
+                    float tempDist = HandleUtility.DistancePointBezier(simulateMousePoint, points[0], points[3], points[1], points[2]);
+
+                    if (tempDist < dist)
+                    {
+                        dist = tempDist;
+                        record_t = t;
+                        recordBezierCurveDot = bezierCurveDot;
+                    }
+                }
+
+                if (dist > minBezierDistThreshold)
+                {
+                    if (lastBezierSegmentInfo.SegmentIndex != i || (lastBezierSegmentInfo.SegmentIndex == i && dist > minRecordBezierDistThreshold))
+                    {
+                        continue;
+                    }
+                }
+
+                lastBezierSegmentInfo.SegmentIndex = i;
+                lastBezierSegmentInfo.t = record_t;
+                lastBezierSegmentInfo.dist = dist;
+                lastBezierSegmentInfo.position = recordBezierCurveDot;
+
+
+                return lastBezierSegmentInfo;
+            }
+
+            lastBezierSegmentInfo.SegmentIndex = -1;
+
+            return lastBezierSegmentInfo;
+        }
+
 
         void AutoSetControlPointIfEnable(int index) {
             creator.SmoothCtrlPoints(index - 3, index + 3);
@@ -148,6 +236,7 @@ namespace Hsinpa.Creator
         void OnEnable()
         {
             creator = (SnakePathCreator)target;
+            lastBezierSegmentInfo = new BezierSegmentInfo();
             //LastTool = Tools.current;
             //Tools.current = Tool.None;
         }
@@ -158,6 +247,12 @@ namespace Hsinpa.Creator
             //Tools.current = LastTool;
         }
 
+        private struct BezierSegmentInfo {
+            public int SegmentIndex;
+            public float t;
+            public float dist;
+            public Vector3 position;
+        }
 
     }
 }

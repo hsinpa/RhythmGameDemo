@@ -38,9 +38,6 @@ namespace Hsinpa.Bezier
 
                 points.Add(AP);
 
-                Debug.Log((i / (float)Segment));
-
-                Debug.DrawLine(PS, AP, Color.white, 100);
             }
 
             //Debug.DrawLine(points[Segment-1], EndPoint.transform.position, Color.white, 100);
