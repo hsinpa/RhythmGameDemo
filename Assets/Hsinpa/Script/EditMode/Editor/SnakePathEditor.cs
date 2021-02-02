@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using Hsinpa.Snake;
 
 namespace Hsinpa.Creator
 {
@@ -35,13 +36,14 @@ namespace Hsinpa.Creator
 
         void OnSceneGUI()
         {
-            Input();
-            Draw();
+            Event guiEvent = Event.current;
+
+            Input(guiEvent);
+            Draw(guiEvent);
         }
 
-        void Input()
+        void Input(Event guiEvent)
         {
-            Event guiEvent = Event.current;
             Vector3 mousePos = HandleUtility.GUIPointToWorldRay(guiEvent.mousePosition).origin;
             Vector3 direction = HandleUtility.GUIPointToWorldRay(guiEvent.mousePosition).direction;
 
@@ -54,10 +56,30 @@ namespace Hsinpa.Creator
 
                 Undo.RecordObject(creator, "Add segment");
                 creator.snakePath.AddSegment(finalPoint);
+
+                AutoSetControlPointIfEnable(creator.snakePath.PointCount - 1);
             }
+
+            //Delete Anchor
+            if (guiEvent.type == EventType.MouseDown && guiEvent.button == 1) {
+
+                int removeIndex = FindTheMostClosetIndex(mousePos, direction);
+
+                if (removeIndex >= 0) {
+
+                    Undo.RecordObject(creator, "Delete segment");
+
+                    Debug.Log("FindTheMostClosetIndex " + removeIndex);
+
+                    creator.snakePath.Delete(removeIndex);
+                    AutoSetControlPointIfEnable(removeIndex);
+                }
+            }
+
+
         }
 
-        void Draw() {
+        void Draw(Event guiEvent) {
 
             if (creator.snakePath != null) {
 
@@ -72,11 +94,15 @@ namespace Hsinpa.Creator
 
 
                 for (int i = 0; i < creator.snakePath.PointCount; i++) {
-                    Handles.color = (i % 3 == 0) ? Color.red : Color.blue;
+                    bool isAnchorP = SnakePath.IsAnchorPoint(i);
+                    Handles.color = (isAnchorP) ? Color.red : Color.blue;
 
                     Vector3 newPos = Handles.FreeMoveHandle(creator.snakePath[i], Quaternion.identity, .2f, _snap, Handles.CylinderHandleCap);
 
-                    if (creator.snakePath[i] != newPos && (!creator.enableAutoContorlPoint || (creator.enableAutoContorlPoint && i % 3 == 0)))
+                    //Move Anchor Around
+                    if (creator.snakePath[i] != newPos && (!creator.enableAutoContorlPoint || ( (creator.enableAutoContorlPoint && isAnchorP) ||
+                        //The first / last control point leave to player to decide
+                        i <= 1 || i >= creator.snakePath.PointCount - 2) ))
                     {
                         Undo.RecordObject(creator, "Move point");
 
@@ -85,10 +111,34 @@ namespace Hsinpa.Creator
                         if (creator.enableAutoContorlPoint) {
                             AutoSetControlPointIfEnable(i);
                         }
-
                     }
                 }
             }
+        }
+
+        int FindTheMostClosetIndex(Vector3 mousePos, Vector3 mouseDir) {
+            int clostetIndex = -1;
+            float clostestDir = 0;
+
+            for (int i = 0; i < creator.snakePath.PointCount; i += 3)
+            {
+                Vector3 targetToCamDir = (creator.snakePath[i] - mousePos).normalized;
+                float dotValue = Vector3.Dot(targetToCamDir, mouseDir);
+
+                //Exist early
+                if (dotValue < clostestDir) return clostetIndex;
+
+                if (dotValue > 0.999f)
+                {
+                    clostestDir = dotValue;
+
+                    clostetIndex = i;
+                    //Debug.Log("Find index " + i + ", " + dotValue);
+                }
+            }
+
+
+            return clostetIndex;
         }
 
         void AutoSetControlPointIfEnable(int index) {

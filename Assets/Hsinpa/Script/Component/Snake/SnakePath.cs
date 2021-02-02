@@ -29,6 +29,8 @@ namespace Hsinpa.Snake {
             }
         }
 
+        public static bool IsAnchorPoint(int index) => (index % 3 == 0);
+
         public void AddSegment(Vector3 anchorPos)
         {
             //Add Ctrl to the previous END POINT
@@ -48,7 +50,7 @@ namespace Hsinpa.Snake {
 
         public void Update(Vector3 newPosition, int i) {
 
-            Debug.Log(i % 3);
+            //Debug.Log(i % 3);
 
             Vector3 deltaMove = newPosition - Points[i];
             Points[i] = newPosition;
@@ -102,6 +104,29 @@ namespace Hsinpa.Snake {
             Points.Add(position);
         }
 
+        public void Delete(int anchorIndex) {
+            if (!IsAnchorPoint(anchorIndex)) return;
+
+            //Minimum segment count
+            if (NumSegments > 1) {
+
+                //Start Anchor
+                if (anchorIndex == 0)
+                {
+                    Points.RemoveRange(0, 3);
+                }
+                //End Anchor
+                else if (anchorIndex == PointCount - 1)
+                {
+                    Points.RemoveRange(anchorIndex - 2, 3);
+                }
+                else
+                {
+                    //The rest anchor
+                    Points.RemoveRange(anchorIndex - 1, 3);
+                }
+            }
+        }
 
 
     }

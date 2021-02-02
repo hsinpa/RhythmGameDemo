@@ -49,7 +49,7 @@ namespace Hsinpa.Creator {
 
             for (int i = startIndex; i <= endIndex; i += 3 )
             {
-                if (i <= 0 || i >= snakePath.PointCount - 1 || i % 3 != 0) continue;
+                if (i <= 0 || i >= snakePath.PointCount - 1 || !SnakePath.IsAnchorPoint(i)) continue;
 
                 Vector3 anchorFaceDir = (snakePath[i + 3] - snakePath[i - 3]).normalized;
                 float halfPreviousDist = Vector3.Distance(snakePath[i - 3], snakePath[i]) * 0.5f;
