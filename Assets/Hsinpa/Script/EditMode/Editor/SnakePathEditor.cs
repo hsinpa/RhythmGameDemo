@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using Hsinpa.Snake;
 using Hsinpa.Utility;
+
 using UnityEngine.SceneManagement;
 
 namespace Hsinpa.Creator
@@ -16,10 +18,8 @@ namespace Hsinpa.Creator
 
         Vector3 _snap = Vector3.one * 0.5f;
         float minBezierDistThreshold = 0.2f;
-        //When minBezierDistThreshold fail, use this to check lastBezierSegmentInfo
-        float minRecordBezierDistThreshold = 1f;
 
-        BezierSegmentInfo lastBezierSegmentInfo;
+        Types.BezierSegmentInfo lastBezierSegmentInfo;
 
         public override void OnInspectorGUI()
         {
@@ -28,7 +28,7 @@ namespace Hsinpa.Creator
             SnakePathCreator myScript = (SnakePathCreator)target;
             if (GUILayout.Button("Default Snake Layout"))
             {
-                Undo.RecordObject(creator, "Create Default Layout");
+                Undo.RecordObject(creator.snakePath, "Create Default Layout");
 
                 myScript.CreateBasicPathSetup();
                 SceneView.RepaintAll();
@@ -36,7 +36,7 @@ namespace Hsinpa.Creator
 
             bool isEnableAutoCtrlP = GUILayout.Toggle(creator.enableAutoContorlPoint, "Enable Auto Ctrl Point");
             if (isEnableAutoCtrlP != creator.enableAutoContorlPoint) {
-                Undo.RecordObject(creator, "Enable Auto Ctrl Point");
+                Undo.RecordObject(creator.snakePath, "Enable Auto Ctrl Point");
                 creator.enableAutoContorlPoint = isEnableAutoCtrlP;
             }
         }
@@ -61,7 +61,7 @@ namespace Hsinpa.Creator
 
                 Vector3 finalPoint = mousePos + (direction * magnitude);
 
-                Undo.RecordObject(creator, "Add segment");
+                Undo.RecordObject(creator.snakePath, "Add segment");
                 creator.snakePath.AddSegment(finalPoint);
 
                 AutoSetControlPointIfEnable(creator.snakePath.PointCount - 1);
@@ -74,9 +74,8 @@ namespace Hsinpa.Creator
 
                 if (removeIndex >= 0) {
 
-                    Undo.RecordObject(creator, "Delete segment");
+                    Undo.RecordObject(creator.snakePath, "Delete segment");
 
-                    Debug.Log("FindTheMostClosetIndex " + removeIndex);
 
                     creator.snakePath.Delete(removeIndex);
                     AutoSetControlPointIfEnable(removeIndex);
@@ -99,10 +98,12 @@ namespace Hsinpa.Creator
             if (guiEvent.type == EventType.MouseDown && guiEvent.button == 0 && guiEvent.control) {
                 if (lastBezierSegmentInfo.SegmentIndex >= 0)
                 {
-                    creator.snakePath.SplitSegment(lastBezierSegmentInfo.position, lastBezierSegmentInfo.SegmentIndex);
+                    Undo.RecordObject(creator.snakePath, "Insert segment");
+
+                    creator.snakePath.SplitSegment(lastBezierSegmentInfo.Position, lastBezierSegmentInfo.SegmentIndex);
 
                     int anchorIndex = lastBezierSegmentInfo.SegmentIndex * 3;
-                    creator.SmoothCtrlPoints(anchorIndex -3, anchorIndex+3);
+                    creator.SmoothCtrlPoints(anchorIndex - 3, anchorIndex + 3);
                     SceneView.RepaintAll();
                 }
             }
@@ -126,7 +127,7 @@ namespace Hsinpa.Creator
 
                     if (i == lastBezierSegmentInfo.SegmentIndex) {
                         Handles.color = Color.red;
-                        Handles.SphereHandleCap(0, lastBezierSegmentInfo.position, Quaternion.identity, 0.2f, EventType.Repaint);
+                        Handles.SphereHandleCap(0, lastBezierSegmentInfo.Position, Quaternion.identity, 0.2f, EventType.Repaint);
                     }
 
                     Handles.DrawBezier(points[0], points[3], points[1], points[2], bezierColor, null, 2);
@@ -140,13 +141,13 @@ namespace Hsinpa.Creator
                     Vector3 newPos = Handles.FreeMoveHandle(creator.snakePath[i], Quaternion.identity, .2f, _snap, Handles.CylinderHandleCap);
 
                     //Move Anchor Around
-                    if (creator.snakePath[i] != newPos && (!creator.enableAutoContorlPoint || ( (creator.enableAutoContorlPoint && isAnchorP) ||
+                    if (creator.snakePath[i] != newPos && (!creator.enableAutoContorlPoint || ((creator.enableAutoContorlPoint && isAnchorP) ||
                         //The first / last control point leave to player to decide
-                        i <= 1 || i >= creator.snakePath.PointCount - 2) ))
+                        i <= 1 || i >= creator.snakePath.PointCount - 2)))
                     {
-                        Undo.RecordObject(creator, "Move point");
+                        Undo.RecordObject(creator.snakePath, "Move point");
 
-                        creator.snakePath.Update(newPos, i);
+                        creator.snakePath.UpdateAnchor(newPos, i);
 
                         if (creator.enableAutoContorlPoint) {
                             AutoSetControlPointIfEnable(i);
@@ -180,7 +181,7 @@ namespace Hsinpa.Creator
             return clostetIndex;
         }
 
-        BezierSegmentInfo FindClosestSegment(Vector3 mousePos, Vector3 mouseDir) {
+        Types.BezierSegmentInfo FindClosestSegment(Vector3 mousePos, Vector3 mouseDir) {
             Vector3 recordBezierCurveDot = Vector3.zero;
 
             for (int i = 0; i < creator.snakePath.NumSegments; i++)
@@ -193,10 +194,8 @@ namespace Hsinpa.Creator
                 for (float t = 0.1f; t < 1; t += 0.1f)
                 {
                     Vector3 bezierCurveDot = SnakeUtility.BezierCurve(points[0], points[1], points[2], points[3], t);
-                    float distToCamera = (mousePos - bezierCurveDot).magnitude;
+                    float distToCamera = (bezierCurveDot - mousePos).magnitude;
                     Vector3 simulateMousePoint = mousePos + (distToCamera * mouseDir);
-
-                    Debug.Log(simulateMousePoint);
 
                     float tempDist = HandleUtility.DistancePointBezier(simulateMousePoint, points[0], points[3], points[1], points[2]);
 
@@ -210,17 +209,12 @@ namespace Hsinpa.Creator
 
                 if (dist > minBezierDistThreshold)
                 {
-                    if (lastBezierSegmentInfo.SegmentIndex != i || (lastBezierSegmentInfo.SegmentIndex == i && dist > minRecordBezierDistThreshold))
-                    {
-                        continue;
-                    }
+                    continue;
                 }
 
                 lastBezierSegmentInfo.SegmentIndex = i;
-                lastBezierSegmentInfo.t = record_t;
-                lastBezierSegmentInfo.dist = dist;
-                lastBezierSegmentInfo.position = recordBezierCurveDot;
-
+                lastBezierSegmentInfo.Interval = record_t;
+                lastBezierSegmentInfo.Position = recordBezierCurveDot;
 
                 return lastBezierSegmentInfo;
             }
@@ -238,22 +232,16 @@ namespace Hsinpa.Creator
         void OnEnable()
         {
             creator = (SnakePathCreator)target;
-            lastBezierSegmentInfo = new BezierSegmentInfo();
-            //LastTool = Tools.current;
-            //Tools.current = Tool.None;
+            lastBezierSegmentInfo = new Types.BezierSegmentInfo();
+
+            LastTool = Tools.current;
+            Tools.current = Tool.None;
         }
 
 
         void OnDisable()
         {
-            //Tools.current = LastTool;
-        }
-
-        private struct BezierSegmentInfo {
-            public int SegmentIndex;
-            public float t;
-            public float dist;
-            public Vector3 position;
+            Tools.current = LastTool;
         }
 
     }

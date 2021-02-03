@@ -22,11 +22,12 @@ namespace Hsinpa.Creator {
             }
         }
 
-
         public SnakePath snakePath => _snakePath;
 
         public void CreateBasicPathSetup() {
-            _snakePath = new SnakePath();
+            // _snakePath = new SnakePath();
+
+            _snakePath.Reset();
 
             //Start Point
             _snakePath.Push(Vector3.zero);

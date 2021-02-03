@@ -1,12 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Hsinpa.Utility;
 using UnityEngine;
 
 namespace Hsinpa.Snake {
 
-    [System.Serializable]
-    public class SnakePath
+    [System.Serializable, CreateAssetMenu(fileName = "Data", menuName = "ScriptableObjects/Path", order = 2)]
+    public class SnakePath : ScriptableObject
     {
+        private Types.BezierSegmentInfo _bezierSegmentInfo = new Types.BezierSegmentInfo();
+
         [SerializeField]
         private List<Vector3> Points = new List<Vector3>();
 
@@ -48,7 +51,7 @@ namespace Hsinpa.Snake {
             return new Vector3[] { Points[i * 3], Points[i * 3 + 1], Points[i * 3 + 2], Points[i * 3 + 3] };
         }
 
-        public void Update(Vector3 newPosition, int i) {
+        public void UpdateAnchor(Vector3 newPosition, int i) {
 
             //Debug.Log(i % 3);
 
@@ -133,6 +136,25 @@ namespace Hsinpa.Snake {
             }
         }
 
+        public void GetSegmentBezierSteps(int segmentIndex, System.Action<Types.BezierSegmentInfo> onIntervalCallback) {
+            float step = 0.1f;
+
+            Vector3[] points = GetPointsInSegment(segmentIndex);
+
+            for (float t = 0.1f; t < 1; t += step) {
+                Vector3 bezierCurveDot = SnakeUtility.BezierCurve(points[0], points[1], points[2], points[3], t);
+
+                _bezierSegmentInfo.Interval = t;
+                _bezierSegmentInfo.SegmentIndex = segmentIndex;
+                _bezierSegmentInfo.Position = bezierCurveDot;
+
+                onIntervalCallback(_bezierSegmentInfo);
+            }
+        }
+
+        public void Reset() {
+            Points.Clear();
+        }
 
     }
 }

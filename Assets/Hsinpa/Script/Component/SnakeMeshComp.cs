@@ -116,34 +116,13 @@ namespace Hsinpa {
 
         }
 
-        private void CreateSimpleMesh() {
-            mesh.Clear();
-
-            List<Vector3> vertices = new List<Vector3>()
-            {
-                new Vector3(1,-1,0), new Vector3(-1,-1,0), new Vector3(-1,1,0),
-                new Vector3(1,-1,0), new Vector3(-1,1,0),  new Vector3(1, 1,0)
-            };
-            
-            List<int> triangles = new List<int>() { 
-                0,1,2,3,4,5
-            };
-
-            List<Vector2> uv = new List<Vector2>();
-
-            int vLength = vertices.Count;
-            for (int i = 0; i < vLength; i++) {
-                uv.Add(NVector3To2(vertices[i]));
-            }
-
-            mesh.SetVertices(vertices);
-            mesh.SetTriangles(triangles, 0);
-            mesh.SetUVs(0, uv);
-        }
-
+        //Vector3 is between -1 to 1, UV should be 0 -1 
         private Vector2 NVector3To2(Vector3 vector) {
-            return new Vector2((vector.x + 1) * 0.5f,
-                (vector.y + 1) * 0.5f);
+
+            return  (vector + Vector3.one) * 0.5f;
+
+            //return new Vector2((vector.x + 1) * 0.5f,
+            //    (vector.y + 1) * 0.5f);
         }
     }
 }

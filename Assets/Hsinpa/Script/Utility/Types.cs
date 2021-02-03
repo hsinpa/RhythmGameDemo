@@ -12,6 +12,14 @@ namespace Hsinpa {
 
         }
 
+        [System.Serializable]
+        public struct BezierSegmentInfo
+        {
+            public int SegmentIndex;
+            public float Interval;
+            public Vector3 Position;
+        }
+
         public enum SnakePathType {
             Point, ControlPoint
         }
