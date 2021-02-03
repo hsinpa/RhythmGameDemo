@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using Hsinpa.SnakeMesh;
-
 namespace Hsinpa.Snake {
 
     [RequireComponent(typeof(MeshFilter)), RequireComponent(typeof(MeshRenderer))]
@@ -17,6 +15,9 @@ namespace Hsinpa.Snake {
 
         [SerializeField]
         private MeshRenderer _meshRenderer;
+
+        [SerializeField, Range(0.05f, 1f)]
+        public float meshSize = 1f;
 
         private Mesh _mesh;
 
@@ -35,12 +36,15 @@ namespace Hsinpa.Snake {
         {
             if (_snakePath == null) return;
 
-            InitMeshIfNeeded();
+            _snakeMeshGenerator.meshSize = meshSize;
 
+            Types.MeshInfo meshInfo = _snakeMeshGenerator.RenderSegments(_snakePath, 0, _snakePath.NumSegments - 1);
 
-            for (int i = 0; i < _snakePath.NumSegments; i++) {
+            _mesh.SetVertices(meshInfo.vertices);
+            _mesh.SetTriangles(meshInfo.triangles, 0);
+            _mesh.SetUVs(0, meshInfo.uv);
 
-            }
+            _mesh.RecalculateNormals();
         }
 
         private void InitMeshIfNeeded() {

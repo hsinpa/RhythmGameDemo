@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Hsinpa.Snake;
+using UnityEngine.Rendering.UI;
 
 namespace Hsinpa.Creator {
     public class SnakePathCreator : MonoBehaviour
@@ -23,6 +24,9 @@ namespace Hsinpa.Creator {
         }
 
         public SnakePath snakePath => _snakePath;
+
+        [SerializeField]
+        private SnakeMesh _snakeMesh;
 
         public void CreateBasicPathSetup() {
             // _snakePath = new SnakePath();
@@ -61,6 +65,16 @@ namespace Hsinpa.Creator {
                 snakePath.ForceUpdate(snakePath[i] - (anchorFaceDir * halfPreviousDist), (i - 1));
                 snakePath.ForceUpdate(snakePath[i] + (anchorFaceDir * halfForwardDist), (i + 1));
             }
+        }
+
+        public void RenderPathLayoutToMesh() {
+            if (_snakeMesh == null) return;
+            
+            _snakeMesh.SetUp();
+
+            _snakeMesh.SetSnakePath(snakePath);
+
+            _snakeMesh.RenderMesh();
         }
 
 

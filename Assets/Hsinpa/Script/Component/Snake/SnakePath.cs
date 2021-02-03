@@ -10,6 +10,9 @@ namespace Hsinpa.Snake {
     {
         private Types.BezierSegmentInfo _bezierSegmentInfo = new Types.BezierSegmentInfo();
 
+        private float bezierStep = 0.1f;
+        private Types.BezierSegmentInfo[] _cacheSegmentInfoArray = new Types.BezierSegmentInfo[11];
+
         [SerializeField]
         private List<Vector3> Points = new List<Vector3>();
 
@@ -136,20 +139,23 @@ namespace Hsinpa.Snake {
             }
         }
 
-        public void GetSegmentBezierSteps(int segmentIndex, System.Action<Types.BezierSegmentInfo> onIntervalCallback) {
-            float step = 0.1f;
+        public Types.BezierSegmentInfo[] GetSegmentBezierSteps(int segmentIndex) {
 
             Vector3[] points = GetPointsInSegment(segmentIndex);
 
-            for (float t = 0.1f; t < 1; t += step) {
+            for (float t = 0; t < 1; t += bezierStep) {
                 Vector3 bezierCurveDot = SnakeUtility.BezierCurve(points[0], points[1], points[2], points[3], t);
+
+                int index = (int)(t * 10);
 
                 _bezierSegmentInfo.Interval = t;
                 _bezierSegmentInfo.SegmentIndex = segmentIndex;
                 _bezierSegmentInfo.Position = bezierCurveDot;
 
-                onIntervalCallback(_bezierSegmentInfo);
+                _cacheSegmentInfoArray[index] = _bezierSegmentInfo;
             }
+
+            return _cacheSegmentInfoArray;
         }
 
         public void Reset() {

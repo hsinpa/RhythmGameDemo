@@ -19,5 +19,24 @@ namespace Hsinpa.Utility {
 
             return Vector3.Lerp(SC, EC, t);
         }
+
+        public static Vector3 RotateTriangle(Vector3 point_a, Vector3 point_b, Vector3 point_c, Vector3 direction) {
+
+            Vector3 centerPoint = GetTriangleCenter(point_a, point_b, point_c);
+
+            Quaternion rotation = Quaternion.Euler(direction.x, direction.y, direction.z);
+            Matrix4x4 m = Matrix4x4.Rotate(rotation);
+
+
+            return Vector3.zero;
+        }
+
+        public static Vector3 GetTriangleCenter(Vector3 point_a, Vector3 point_b, Vector3 point_c) {
+            float x = (point_a.x + point_b.x + point_c.x) / 3f;
+            float y = (point_a.y + point_b.y + point_c.y) / 3f;
+            float z = (point_a.z + point_b.z + point_c.z) / 3f;
+
+            return new Vector3(x, y ,z);
+        }
     }
 }

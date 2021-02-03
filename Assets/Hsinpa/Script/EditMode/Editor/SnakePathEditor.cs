@@ -234,14 +234,14 @@ namespace Hsinpa.Creator
             creator = (SnakePathCreator)target;
             lastBezierSegmentInfo = new Types.BezierSegmentInfo();
 
-            LastTool = Tools.current;
-            Tools.current = Tool.None;
+            //LastTool = Tools.current;
+            //Tools.current = Tool.None;
         }
 
 
         void OnDisable()
         {
-            Tools.current = LastTool;
+            //Tools.current = LastTool;
         }
 
     }
