@@ -15,7 +15,7 @@ namespace Hsinpa.Creator
         Tool LastTool = Tool.None;
 
         Vector3 _snap = Vector3.one * 0.5f;
-        float minBezierDistThreshold = 0.5f;
+        float minBezierDistThreshold = 0.2f;
         //When minBezierDistThreshold fail, use this to check lastBezierSegmentInfo
         float minRecordBezierDistThreshold = 1f;
 
@@ -126,7 +126,7 @@ namespace Hsinpa.Creator
 
                     if (i == lastBezierSegmentInfo.SegmentIndex) {
                         Handles.color = Color.red;
-                        Handles.SphereHandleCap(0, lastBezierSegmentInfo.position, Quaternion.identity, 0.1f, EventType.Repaint);
+                        Handles.SphereHandleCap(0, lastBezierSegmentInfo.position, Quaternion.identity, 0.2f, EventType.Repaint);
                     }
 
                     Handles.DrawBezier(points[0], points[3], points[1], points[2], bezierColor, null, 2);
@@ -187,14 +187,16 @@ namespace Hsinpa.Creator
             {
                 Vector3[] points = creator.snakePath.GetPointsInSegment(i);
 
-                float dist = 10;
+                float dist = 1000;
                 float record_t = 0;
 
-                for (float t = 0; t <= 1; t += 0.1f)
+                for (float t = 0.1f; t < 1; t += 0.1f)
                 {
                     Vector3 bezierCurveDot = SnakeUtility.BezierCurve(points[0], points[1], points[2], points[3], t);
-                    float distToCamera = (bezierCurveDot - mousePos).magnitude;
-                    Vector3 simulateMousePoint = mousePos + (mouseDir * distToCamera);
+                    float distToCamera = (mousePos - bezierCurveDot).magnitude;
+                    Vector3 simulateMousePoint = mousePos + (distToCamera * mouseDir);
+
+                    Debug.Log(simulateMousePoint);
 
                     float tempDist = HandleUtility.DistancePointBezier(simulateMousePoint, points[0], points[3], points[1], points[2]);
 
