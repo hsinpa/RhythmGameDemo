@@ -12,4 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ee7ec2f7ad5f43898b9f6d8d5b42b4b, type: 3}
   m_Name: Demo
   m_EditorClassIdentifier: 
-  Points: []
+  Points:
+  - {x: 0, y: 0, z: 0}
+  - {x: -0.119433165, y: 0.67230296, z: 0.68209803}
+  - {x: 0, y: -1, z: 2}
+  - {x: 0, y: 0, z: 2}
+  - {x: 0, y: 1, z: 2}
+  - {x: 0, y: 0.5, z: 2.5}
+  - {x: 0, y: 0, z: 3}

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR;
+using Hsinpa.Utility;
 
 namespace Hsinpa.Snake
 {
@@ -39,24 +40,54 @@ namespace Hsinpa.Snake
 
                 for (int k = startIndex; k < segmentChunk; k++) {
                     Vector3 faceDir = Vector3.forward;
+                    Vector3 topDir = Vector3.up;
 
-                    if (k > 0) {
-                        faceDir =  (bezierInfo[k].Position - bezierInfo[k - 1].Position).normalized;
-                        //Debug.Log(faceDir);
+                    Vector3 rightDir = Vector3.right;
+
+                    if (k > 0)
+                    {
+                        faceDir = (bezierInfo[k].Position - bezierInfo[k - 1].Position).normalized;
+
+                        rightDir = new Vector3(-(bezierInfo[k - 1].Position.z - bezierInfo[k].Position.z),
+                            0, bezierInfo[k - 1].Position.x - bezierInfo[k].Position.x).normalized;
+                    }
+                    else {
+                        faceDir = (bezierInfo[k+1].Position - bezierInfo[k].Position).normalized;
+
+                        rightDir = new Vector3(-(bezierInfo[k].Position.z - bezierInfo[k+1].Position.z),
+                            0, bezierInfo[k].Position.x - bezierInfo[k+1].Position.x).normalized;
+
                     }
 
-                    Vector3 topVertice = new Vector3(bezierInfo[k].Position.x, bezierInfo[k].Position.y + SizeDelimitor, bezierInfo[k].Position.z);
-                    Vector3 rightVertice = new Vector3(bezierInfo[k].Position.x + SizeDelimitor, bezierInfo[k].Position.y - SizeDelimitor, bezierInfo[k].Position.z);
-                    Vector3 leftVertice = new Vector3(bezierInfo[k].Position.x - SizeDelimitor, bezierInfo[k].Position.y - SizeDelimitor, bezierInfo[k].Position.z);
+                    //Vector3 rightDir = Vector3.Cross(topDir, faceDir).normalized;
+                    topDir = Vector3.Cross(faceDir, rightDir).normalized;
+                    Debug.Log(topDir);
+                    Vector3 topVertice = bezierInfo[k].Position + (topDir * SizeDelimitor);
+                    Vector3 rightVertice = bezierInfo[k].Position + (rightDir * SizeDelimitor - (topDir * SizeDelimitor));
+                    Vector3 leftVertice = bezierInfo[k].Position + (-rightDir * SizeDelimitor - (topDir * SizeDelimitor));
 
-                    Vector3 normal = Vector3.Cross(leftVertice - topVertice, rightVertice - topVertice).normalized;
-                    Vector3 normalDiff = faceDir - normal;
+                    //Vector3 topVertice = new Vector3(bezierInfo[k].Position.x, bezierInfo[k].Position.y + SizeDelimitor, bezierInfo[k].Position.z);
+                    //Vector3 rightVertice = new Vector3(bezierInfo[k].Position.x + SizeDelimitor, bezierInfo[k].Position.y - SizeDelimitor, bezierInfo[k].Position.z);
+                    //Vector3 leftVertice = new Vector3(bezierInfo[k].Position.x - SizeDelimitor, bezierInfo[k].Position.y - SizeDelimitor, bezierInfo[k].Position.z);
+                    //Vector3 centerVertice = SnakeUtility.GetTriangleCenter(topVertice, leftVertice, rightVertice);
 
-                    Quaternion rotation = Quaternion.Euler(faceDir.x, faceDir.y, faceDir.z);
-                    Matrix4x4 m = Matrix4x4.Rotate(rotation);
-                    topVertice = m.MultiplyPoint3x4(topVertice);
-                    rightVertice = m.MultiplyPoint3x4(rightVertice);
-                    leftVertice = m.MultiplyPoint3x4(leftVertice);
+                    //Vector3 offsetT = topVertice - bezierInfo[k].Position;
+                    //Vector3 offsetR = rightVertice - bezierInfo[k].Position;
+                    //Vector3 offsetL = leftVertice - bezierInfo[k].Position;
+
+
+                    //Vector3 normal = Vector3.Cross(leftVertice - topVertice, rightVertice - topVertice).normalized;
+                    //Vector3 offset = (faceDir - normal).normalized;
+                    //Debug.Log(offset);
+                    //Quaternion rotation = Quaternion.Euler(offset.x, offset.y, offset.z);
+                    //Matrix4x4 m = Matrix4x4.Rotate(rotation);
+                    //Vector3 rotateCenter = m.MultiplyPoint3x4(bezierInfo[k].Position);
+
+                    //topVertice = m.MultiplyPoint3x4(topVertice);
+                    //rightVertice = m.MultiplyPoint3x4(rightVertice);
+                    //leftVertice = m.MultiplyPoint3x4(leftVertice);
+
+
 
                     vertices.Add(topVertice);
                     vertices.Add(rightVertice);
