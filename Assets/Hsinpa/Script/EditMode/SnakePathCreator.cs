@@ -28,6 +28,10 @@ namespace Hsinpa.Creator {
         [SerializeField]
         private SnakeMesh _snakeMesh;
 
+        public Vector2 XAxisConstraints;
+
+        public Vector2 YAxisConstraints;
+
         public void CreateBasicPathSetup() {
             // _snakePath = new SnakePath();
 

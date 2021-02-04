@@ -34,6 +34,11 @@ namespace Hsinpa.Creator
                 SceneView.RepaintAll();
             }
 
+            if (GUILayout.Button("Render Mesh"))
+            {
+                myScript.RenderPathLayoutToMesh();
+            }
+
             bool isEnableAutoCtrlP = GUILayout.Toggle(creator.enableAutoContorlPoint, "Enable Auto Ctrl Point");
             if (isEnableAutoCtrlP != creator.enableAutoContorlPoint) {
                 Undo.RecordObject(creator.snakePath, "Enable Auto Ctrl Point");
@@ -140,6 +145,9 @@ namespace Hsinpa.Creator
 
                     Vector3 newPos = Handles.FreeMoveHandle(creator.snakePath[i], Quaternion.identity, .2f, _snap, Handles.CylinderHandleCap);
 
+                    if (isAnchorP)
+                        newPos = ClampPositionToConstraint(newPos);
+
                     //Move Anchor Around
                     if (creator.snakePath[i] != newPos && (!creator.enableAutoContorlPoint || ((creator.enableAutoContorlPoint && isAnchorP) ||
                         //The first / last control point leave to player to decide
@@ -213,7 +221,6 @@ namespace Hsinpa.Creator
                 }
 
                 lastBezierSegmentInfo.SegmentIndex = i;
-                lastBezierSegmentInfo.Interval = record_t;
                 lastBezierSegmentInfo.Position = recordBezierCurveDot;
 
                 return lastBezierSegmentInfo;
@@ -227,6 +234,17 @@ namespace Hsinpa.Creator
 
         void AutoSetControlPointIfEnable(int index) {
             creator.SmoothCtrlPoints(index - 3, index + 3);
+        }
+
+        bool HasPositionInsideConstraint(Vector3 position) {
+            return (position.x >= creator.XAxisConstraints.x && position.x <= creator.XAxisConstraints.y) &&
+                    (position.y >= creator.YAxisConstraints.x && position.y <= creator.YAxisConstraints.y);
+        }
+
+        Vector3 ClampPositionToConstraint(Vector3 position)
+        {
+            return new Vector3(Mathf.Clamp(position.x, creator.XAxisConstraints.x, creator.XAxisConstraints.y),
+                                Mathf.Clamp(position.y, creator.YAxisConstraints.x, creator.YAxisConstraints.y), position.z);
         }
 
         void OnEnable()

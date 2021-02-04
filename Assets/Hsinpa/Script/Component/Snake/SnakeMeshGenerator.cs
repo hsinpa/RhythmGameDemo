@@ -27,15 +27,14 @@ namespace Hsinpa.Snake
             triangles.Clear();
             uv.Clear();
 
-            int segmentChunk = 10;
             float SizeDelimitor = 1 * meshSize;
             for (int i = 0; i < snakePath.NumSegments; i++)
             {
-                int z = i;
                 //Ingore index 0 if not in first segment
                 int startIndex = (i == 0) ? 0 : 1;
 
-                Types.BezierSegmentInfo[] bezierInfo = snakePath.GetSegmentBezierSteps(i);
+                List<Types.BezierSegmentInfo> bezierInfo = snakePath.GetSegmentBezierSteps(i);
+                int segmentChunk = bezierInfo.Count;
                 //int bezierInfo
 
                 for (int k = startIndex; k < segmentChunk; k++) {

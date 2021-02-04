@@ -10,8 +10,10 @@ namespace Hsinpa.Snake {
     {
         private Types.BezierSegmentInfo _bezierSegmentInfo = new Types.BezierSegmentInfo();
 
-        private float bezierStep = 0.1f;
-        private Types.BezierSegmentInfo[] _cacheSegmentInfoArray = new Types.BezierSegmentInfo[11];
+        private const float bezierStep = 0.05f;
+        private float bezierDist = 0.1f;
+
+        private List<Types.BezierSegmentInfo> _cacheSegmentInfoArray = new List<Types.BezierSegmentInfo>();
 
         [SerializeField]
         private List<Vector3> Points = new List<Vector3>();
@@ -139,20 +141,32 @@ namespace Hsinpa.Snake {
             }
         }
 
-        public Types.BezierSegmentInfo[] GetSegmentBezierSteps(int segmentIndex) {
+        public List<Types.BezierSegmentInfo> GetSegmentBezierSteps(int segmentIndex) {
+            _cacheSegmentInfoArray.Clear();
 
             Vector3[] points = GetPointsInSegment(segmentIndex);
 
-            for (float t = 0; t < 1; t += bezierStep) {
+            for (float t = 0f; t <= 1; t += bezierStep) {
                 Vector3 bezierCurveDot = SnakeUtility.BezierCurve(points[0], points[1], points[2], points[3], t);
 
-                int index = (int)(t * 10);
+                //float tempInterval = t;
+                //float dist = 100;
 
-                _bezierSegmentInfo.Interval = t;
+                //if (t > 0) {
+
+                //    while (dist < bezierDist)
+                //    {
+                //        tempInterval *= 0.5f;
+                //        Vector3 newBezierCurveDot = SnakeUtility.BezierCurve(points[0], points[1], points[2], points[3], tempInterval);
+
+                //        dist = Vector3.Distance(bezierCurveDot, newBezierCurveDot);
+                //    }
+                //}
+
                 _bezierSegmentInfo.SegmentIndex = segmentIndex;
                 _bezierSegmentInfo.Position = bezierCurveDot;
 
-                _cacheSegmentInfoArray[index] = _bezierSegmentInfo;
+                _cacheSegmentInfoArray.Add(_bezierSegmentInfo);
             }
 
             return _cacheSegmentInfoArray;
