@@ -14,10 +14,13 @@ namespace Hsinpa.Creator
     public class SnakePathEditor : Editor
     {
         SnakePathCreator creator;
+        Vector3 parentPos => creator.transform.position;
         Tool LastTool = Tool.None;
+
 
         Vector3 _snap = Vector3.one * 0.5f;
         float minBezierDistThreshold = 0.2f;
+
 
         Types.BezierSegmentInfo lastBezierSegmentInfo;
 
@@ -61,13 +64,13 @@ namespace Hsinpa.Creator
 
             if (guiEvent.type == EventType.MouseDown && guiEvent.button == 0 && guiEvent.shift)
             {
-                Vector3 lastPoint = creator.snakePath[creator.snakePath.PointCount - 1];
+                Vector3 lastPoint = ConvertToWorldPos(creator.snakePath[creator.snakePath.PointCount - 1]);
                 float magnitude = Vector3.Distance(lastPoint, mousePos);
 
                 Vector3 finalPoint = mousePos + (direction * magnitude);
 
                 Undo.RecordObject(creator.snakePath, "Add segment");
-                creator.snakePath.AddSegment(finalPoint);
+                creator.snakePath.AddSegment(ConvertToLocalPos(finalPoint));
 
                 AutoSetControlPointIfEnable(creator.snakePath.PointCount - 1);
             }
@@ -80,8 +83,6 @@ namespace Hsinpa.Creator
                 if (removeIndex >= 0) {
 
                     Undo.RecordObject(creator.snakePath, "Delete segment");
-
-
                     creator.snakePath.Delete(removeIndex);
                     AutoSetControlPointIfEnable(removeIndex);
                 }
@@ -96,7 +97,6 @@ namespace Hsinpa.Creator
                     //Debug.Log($"SegmentIndex {lastBezierSegmentInfo.SegmentIndex}, t {lastBezierSegmentInfo.t}, dist {lastBezierSegmentInfo.dist}");
                     SceneView.RepaintAll();
                 }
-
             }
 
 
@@ -105,7 +105,7 @@ namespace Hsinpa.Creator
                 {
                     Undo.RecordObject(creator.snakePath, "Insert segment");
 
-                    creator.snakePath.SplitSegment(lastBezierSegmentInfo.Position, lastBezierSegmentInfo.SegmentIndex);
+                    creator.snakePath.SplitSegment(ConvertToLocalPos(lastBezierSegmentInfo.Position), lastBezierSegmentInfo.SegmentIndex);
 
                     int anchorIndex = lastBezierSegmentInfo.SegmentIndex * 3;
                     creator.SmoothCtrlPoints(anchorIndex - 3, anchorIndex + 3);
@@ -124,9 +124,15 @@ namespace Hsinpa.Creator
                 for (int i = 0; i < creator.snakePath.NumSegments; i++)
                 {
                     Vector3[] points = creator.snakePath.GetPointsInSegment(i);
+                    points = ConvertArrayToWorldPos(points);
+
                     Handles.color = Color.black;
-                    Handles.DrawLine(points[1], points[0]);
-                    Handles.DrawLine(points[2], points[3]);
+
+                    Vector3 worldPos = ConvertToWorldPos(creator.snakePath[i]);
+                    Vector3 newPos = Handles.FreeMoveHandle(worldPos, Quaternion.identity, .2f, _snap, Handles.CylinderHandleCap);
+
+                    Handles.DrawLine(points[1], (points[0]));
+                    Handles.DrawLine(points[2], (points[3]));
 
                     Color bezierColor = (i == lastBezierSegmentInfo.SegmentIndex) ? Color.yellow : Color.green;
 
@@ -143,19 +149,21 @@ namespace Hsinpa.Creator
                     bool isAnchorP = SnakePath.IsAnchorPoint(i);
                     Handles.color = (isAnchorP) ? Color.red : Color.blue;
 
-                    Vector3 newPos = Handles.FreeMoveHandle(creator.snakePath[i], Quaternion.identity, .2f, _snap, Handles.CylinderHandleCap);
+                    Vector3 worldPos = ConvertToWorldPos(creator.snakePath[i]);
+                    Vector3 newPos = Handles.FreeMoveHandle(worldPos, Quaternion.identity, .2f, _snap, Handles.CylinderHandleCap);
+                    Vector3 LocalPos = ConvertToLocalPos(newPos);
 
                     if (isAnchorP)
-                        newPos = ClampPositionToConstraint(newPos);
+                        LocalPos = ClampPositionToConstraint(LocalPos);
 
                     //Move Anchor Around
-                    if (creator.snakePath[i] != newPos && (!creator.enableAutoContorlPoint || ((creator.enableAutoContorlPoint && isAnchorP) ||
+                    if (creator.snakePath[i] != LocalPos && (!creator.enableAutoContorlPoint || ((creator.enableAutoContorlPoint && isAnchorP) ||
                         //The first / last control point leave to player to decide
                         i <= 1 || i >= creator.snakePath.PointCount - 2)))
                     {
                         Undo.RecordObject(creator.snakePath, "Move point");
 
-                        creator.snakePath.UpdateAnchor(newPos, i);
+                        creator.snakePath.UpdateAnchor(LocalPos, i);
 
                         if (creator.enableAutoContorlPoint) {
                             AutoSetControlPointIfEnable(i);
@@ -171,7 +179,7 @@ namespace Hsinpa.Creator
 
             for (int i = 0; i < creator.snakePath.PointCount; i += 3)
             {
-                Vector3 targetToCamDir = (creator.snakePath[i] - mousePos).normalized;
+                Vector3 targetToCamDir = ( ConvertToWorldPos(creator.snakePath[i]) - mousePos).normalized;
                 float dotValue = Vector3.Dot(targetToCamDir, mouseDir);
 
                 //Exist early
@@ -195,6 +203,7 @@ namespace Hsinpa.Creator
             for (int i = 0; i < creator.snakePath.NumSegments; i++)
             {
                 Vector3[] points = creator.snakePath.GetPointsInSegment(i);
+                points = ConvertArrayToWorldPos(points);
 
                 float dist = 1000;
                 float record_t = 0;
@@ -239,6 +248,25 @@ namespace Hsinpa.Creator
         bool HasPositionInsideConstraint(Vector3 position) {
             return (position.x >= creator.XAxisConstraints.x && position.x <= creator.XAxisConstraints.y) &&
                     (position.y >= creator.YAxisConstraints.x && position.y <= creator.YAxisConstraints.y);
+        }
+
+        Vector3 ConvertToWorldPos(Vector3 p_vector) {
+            return parentPos + p_vector;
+        }
+
+        Vector3[] ConvertArrayToWorldPos(Vector3[] p_vectors)
+        {
+            int count = p_vectors.Length;
+
+            for (int i = 0; i < count; i++) {
+                p_vectors[i] = p_vectors[i] + parentPos;
+            }
+
+            return p_vectors;
+        }
+
+        Vector3 ConvertToLocalPos(Vector3 p_vector) {
+            return p_vector - parentPos;
         }
 
         Vector3 ClampPositionToConstraint(Vector3 position)
