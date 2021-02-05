@@ -7,6 +7,7 @@ using Hsinpa.Snake;
 using Hsinpa.Utility;
 
 using UnityEngine.SceneManagement;
+using System;
 
 namespace Hsinpa.Creator
 {
@@ -59,15 +60,19 @@ namespace Hsinpa.Creator
 
         void Input(Event guiEvent)
         {
+            
             Vector3 mousePos = HandleUtility.GUIPointToWorldRay(guiEvent.mousePosition).origin;
             Vector3 direction = HandleUtility.GUIPointToWorldRay(guiEvent.mousePosition).direction;
 
-            if (guiEvent.type == EventType.MouseDown && guiEvent.button == 0 && guiEvent.shift)
+            //Only allow adding segment on orthographic mode and 100% along one camera axis
+            if (guiEvent.type == EventType.MouseDown && guiEvent.button == 0 && guiEvent.shift && IsAddSegmentAvailable(direction))
             {
+                
                 Vector3 lastPoint = ConvertToWorldPos(creator.snakePath[creator.snakePath.PointCount - 1]);
-                float magnitude = Vector3.Distance(lastPoint, mousePos);
+                //float magnitude = Vector3.Distance(lastPoint, mousePos);
 
-                Vector3 finalPoint = mousePos + (direction * magnitude);
+                //Vector3 finalPoint = mousePos + (direction * magnitude);
+                Vector3 finalPoint = RestrictPositionBaseOnCameraDir(direction, mousePos, lastPoint);
 
                 Undo.RecordObject(creator.snakePath, "Add segment");
                 creator.snakePath.AddSegment(ConvertToLocalPos(finalPoint));
@@ -273,6 +278,25 @@ namespace Hsinpa.Creator
         {
             return new Vector3(Mathf.Clamp(position.x, creator.XAxisConstraints.x, creator.XAxisConstraints.y),
                                 Mathf.Clamp(position.y, creator.YAxisConstraints.x, creator.YAxisConstraints.y), position.z);
+        }
+
+        bool IsAddSegmentAvailable(Vector3 cameraDir)
+        {
+            float mod1 = (cameraDir.x % 1f) + (cameraDir.y % 1f) + (cameraDir.z % 1f);
+            float round2Decimal = (float)Math.Round(mod1 * 100f) / 100f;
+
+            return round2Decimal == 0;
+        }
+
+        Vector3 RestrictPositionBaseOnCameraDir(Vector3 cameraDir, Vector3 mousePos, Vector3 lastAnchorPoint) {
+            Vector3 absCameraDir = new Vector3(Mathf.Abs(cameraDir.x), Mathf.Abs(cameraDir.y), Mathf.Abs(cameraDir.z));
+            lastAnchorPoint.Scale(absCameraDir);
+
+            Vector3 offset = new Vector3(1 - absCameraDir.x, 1 - absCameraDir.y, 1 - absCameraDir.z);
+
+            mousePos.Scale(offset);
+
+            return mousePos + (lastAnchorPoint);
         }
 
         void OnEnable()

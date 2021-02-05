@@ -13,13 +13,6 @@ namespace Hsinpa.Creator
         public override void OnInspectorGUI()
         {
             DrawDefaultInspector();
-
-            SnakeMesh myScript = (SnakeMesh)target;
-            if (GUILayout.Button("Render Mesh"))
-            {
-                myScript.SetUp();
-                myScript.RenderMesh();
-            }
         }
 
     }

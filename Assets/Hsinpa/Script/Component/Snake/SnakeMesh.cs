@@ -39,7 +39,7 @@ namespace Hsinpa.Snake {
             _snakeMeshGenerator.meshSize = meshSize;
 
             Types.MeshInfo meshInfo = _snakeMeshGenerator.RenderSegments(_snakePath, 0, _snakePath.NumSegments - 1);
-
+            _mesh.Clear();
             _mesh.SetVertices(meshInfo.vertices);
             _mesh.SetTriangles(meshInfo.triangles, 0);
             _mesh.SetUVs(0, meshInfo.uv);

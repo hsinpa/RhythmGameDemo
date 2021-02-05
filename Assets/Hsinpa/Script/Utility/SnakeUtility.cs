@@ -38,5 +38,12 @@ namespace Hsinpa.Utility {
 
             return new Vector3(x, y ,z);
         }
+
+        public static Vector3 VectorAddition(Vector3 vector_a, float scalar){
+            vector_a.Set(scalar + vector_a.x, scalar + vector_a.y, scalar + vector_a.z);
+
+            return vector_a;
+        }
+
     }
 }
