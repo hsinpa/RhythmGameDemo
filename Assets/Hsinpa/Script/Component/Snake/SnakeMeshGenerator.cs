@@ -131,6 +131,7 @@ namespace Hsinpa.Snake
         //Vector3 is between -1 to 1, UV should be 0 -1 
         private Vector2 NVector3To2(Vector3 vector)
         {
+            vector.Normalize();
             return (vector + Vector3.one) * 0.5f;
         }
     }
