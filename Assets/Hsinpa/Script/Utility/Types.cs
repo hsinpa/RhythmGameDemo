@@ -34,6 +34,20 @@ namespace Hsinpa {
             public List<Vector2> uv;
         }
 
+        [System.Serializable]
+        public struct LevelJSON {
+            public string bpm;
+
+            public LevelComponent[] sequence;
+        }
+
+        [System.Serializable]
+        public struct LevelComponent {
+            public string type;
+            public float time;
+            public string value;
+        }
+
         public enum SnakePathType {
             Point, ControlPoint
         }

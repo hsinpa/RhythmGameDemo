@@ -1,0 +1,23 @@
+{
+	"bpm" : 120,
+	"sequence" : [
+		{
+			"type" : "speed",
+			"time" : 0,
+			"value" : "1"
+		},
+
+		{
+			"type" : "snake",
+			"time" : 0.5,
+			"value" : "Data_01"
+		},
+
+		{
+			"type" : "snake",
+			"time" : 0.5,
+			"value" : "Data_02"
+		}
+	]
+	
+}
