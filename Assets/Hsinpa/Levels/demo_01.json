@@ -9,13 +9,13 @@
 
 		{
 			"type" : "snake",
-			"time" : 0.5,
+			"time" : 2.5,
 			"value" : "Data_01"
 		},
 
 		{
 			"type" : "snake",
-			"time" : 0.5,
+			"time" : 2.5,
 			"value" : "Data_02"
 		}
 	]
