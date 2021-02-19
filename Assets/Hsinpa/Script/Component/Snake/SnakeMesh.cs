@@ -9,6 +9,7 @@ namespace Hsinpa.Snake {
     {
         [SerializeField]
         private SnakePath _snakePath;
+        public SnakePath snakePath => _snakePath;
 
         [SerializeField]
         private MeshFilter _meshFilter;

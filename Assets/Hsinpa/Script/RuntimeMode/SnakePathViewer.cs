@@ -32,11 +32,23 @@ namespace Hsinpa {
 
         private Dictionary<string, System.Action<Types.LevelComponent>> NoteActionTable = new Dictionary<string, System.Action<Types.LevelComponent>>();
 
+        private List<NoteStruct> noteList = new List<NoteStruct>();
+
+        private float default_time = 2f;
+        private float default_distance = 18;
+
+        private int bpm = 1;
+        private float user_speed = 0;
+        private float distance;
+
+        private float deltaTime = 0.02f;
+
         public void Start()
         {
+            deltaTime = Time.deltaTime;
             NoteActionTable = RegisterNoteTable();
             noteIndex = -1;
-            
+
             PlaySnakeView();
         }
 
@@ -79,6 +91,8 @@ namespace Hsinpa {
 
                 doneProcessing = !noteAvailable;
             }
+
+            ProcessNoteMovement();
         }
 
         private void ProcessNote(int index) {
@@ -90,6 +104,16 @@ namespace Hsinpa {
             }
         }
 
+        private void ProcessNoteMovement() {
+            int noteLength = noteList.Count;
+            Vector3 velocity3D = Vector3.zero;
+
+            for (int i = 0; i < noteLength; i++) {
+                velocity3D.z = -noteList[i].velocity;
+                noteList[i].snakeMesh.transform.Translate(velocity3D);
+            }
+        }
+
         private void ProcessSpeedNote(Types.LevelComponent component) {
             Debug.Log($"Type {component.type}, Time {component.time}, Value {component.value}");
         }
@@ -97,7 +121,12 @@ namespace Hsinpa {
         private void ProcessSnakeNote(Types.LevelComponent component) {
             Debug.Log($"Type {component.type}, Time {component.time}, Value {component.value}");
 
-            SpawnSnakeMesh(component);
+            SnakeMesh snakeNote = SpawnSnakeMesh(component);
+            NoteStruct noteStruct = new NoteStruct();
+            noteStruct.snakeMesh = snakeNote;
+            noteStruct.component = component;
+            noteStruct.velocity = ((default_distance - snakeNote.snakePath[0].z) / default_time) * deltaTime;
+            noteList.Add(noteStruct);
         }
 
         private SnakeMesh SpawnSnakeMesh(Types.LevelComponent component) {
@@ -109,9 +138,11 @@ namespace Hsinpa {
                 spawnEmptySnake.SetUp();
                 spawnEmptySnake.SetSnakePath(snakePathData);
                 spawnEmptySnake.RenderMesh();
+
+                spawnEmptySnake.transform.position = new Vector3(0, -0.8f, default_distance - snakePathData[0].z);
             }
 
-            return spawnEmptySnake;   
+            return spawnEmptySnake;
         }
 
         private bool isNextNoteAvailable(int index) {
@@ -120,5 +151,10 @@ namespace Hsinpa {
             return (levelJSON.sequence[index].time < (currentTime + noteTime));
         }
 
+        private struct NoteStruct {
+            public SnakeMesh snakeMesh;
+            public Types.LevelComponent component;
+            public float velocity;
+        }
     }
 }
