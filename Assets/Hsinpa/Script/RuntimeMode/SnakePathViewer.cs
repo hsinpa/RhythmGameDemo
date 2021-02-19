@@ -79,8 +79,6 @@ namespace Hsinpa {
 
                 doneProcessing = !noteAvailable;
             }
-
-            Debug.Log(currentTime);
         }
 
         private void ProcessNote(int index) {
@@ -90,7 +88,6 @@ namespace Hsinpa {
             if (NoteActionTable.TryGetValue(levelComp.type, out System.Action<Types.LevelComponent> action)) {
                 action(levelComp);
             }
-
         }
 
         private void ProcessSpeedNote(Types.LevelComponent component) {
@@ -99,6 +96,22 @@ namespace Hsinpa {
 
         private void ProcessSnakeNote(Types.LevelComponent component) {
             Debug.Log($"Type {component.type}, Time {component.time}, Value {component.value}");
+
+            SpawnSnakeMesh(component);
+        }
+
+        private SnakeMesh SpawnSnakeMesh(Types.LevelComponent component) {
+            SnakeMesh spawnEmptySnake = UtilityMethod.CreateObjectToParent<SnakeMesh>(SnakeHolder, snakePrefab.gameObject);
+
+            SnakePath snakePathData = LevelSRP.GetSnakePath(component.value);
+
+            if (snakePathData != null) {
+                spawnEmptySnake.SetUp();
+                spawnEmptySnake.SetSnakePath(snakePathData);
+                spawnEmptySnake.RenderMesh();
+            }
+
+            return spawnEmptySnake;   
         }
 
         private bool isNextNoteAvailable(int index) {

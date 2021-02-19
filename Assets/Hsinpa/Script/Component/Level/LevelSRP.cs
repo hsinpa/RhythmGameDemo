@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 namespace Hsinpa.Level
 {
@@ -12,5 +13,11 @@ namespace Hsinpa.Level
         private SnakePath[] _snakePaths;
 
         public SnakePath[] snakePath => _snakePaths;
+
+        public SnakePath GetSnakePath(string id) {
+            if (_snakePaths == null) return null;
+
+            return _snakePaths.First(x => x.name == id);
+        }
     }
 }

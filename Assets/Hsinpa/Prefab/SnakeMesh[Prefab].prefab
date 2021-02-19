@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 3982378655311052376}
   - component: {fileID: 3982378655311052379}
   m_Layer: 0
-  m_Name: Creator
+  m_Name: SnakeMesh[Prefab]
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -92,7 +92,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff89529c41abe47eb91f64adfb790fc4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _snakePath: {fileID: 11400000, guid: 4c19a47048ecdc1488a0e9a930245a8a, type: 2}
+  _snakePath: {fileID: 0}
   _meshFilter: {fileID: 3982378655311052377}
   _meshRenderer: {fileID: 3982378655311052376}
-  meshSize: 0.31
+  meshSize: 0.3
