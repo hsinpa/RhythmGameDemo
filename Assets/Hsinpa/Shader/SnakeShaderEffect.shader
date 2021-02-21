@@ -9,26 +9,26 @@
     }
     SubShader
     {
-        Tags {"Queue" = "Transparent" "IgnoreProjector" = "True" "RenderType" = "Transparent"}
-        ZWrite Off
+        Tags {"RenderType" = "Opaque"}
         Cull Off
-        Blend SrcAlpha OneMinusSrcAlpha
         LOD 100
 
         Pass
         {
             CGPROGRAM
+            #pragma multi_compile_fwdbase
             #pragma vertex vert
             #pragma fragment frag
-            // make fog work
-            #pragma multi_compile_fog
 
+            #include "Lighting.cginc"
             #include "UnityCG.cginc"
+            #include "UnityLightingCommon.cginc" // for _LightColor0
 
             struct appdata
             {
                 float4 vertex : POSITION;
                 float2 uv : TEXCOORD0;
+                float3 normal   : NORMAL;    // The vertex normal in model space.
             };
 
             struct v2f
@@ -36,6 +36,7 @@
                 float2 uv : TEXCOORD0;
                 float4 vertex : SV_POSITION;
                 float4 worldPos : TEXCOORD1;
+                float lightStrength : TEXCOORD2;
             };
 
             sampler2D _MainTex;
@@ -49,6 +50,10 @@
                 o.worldPos = mul(unity_ObjectToWorld, v.vertex);
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
 
+                half nl = max(0, dot(v.normal, _WorldSpaceLightPos0.xyz));
+
+                o.lightStrength = nl;
+
                 return o;
             }
 
@@ -56,9 +61,13 @@
             {
                 fixed4 col = tex2D(_MainTex, i.uv);
                 
-                col.a = 0;
+                col = col * i.lightStrength;
+
                 if (i.worldPos.z <= _Constraint.y && i.worldPos.z >= _Constraint.x)
                     col.a = 1;
+                else
+                    discard;
+
 
                 return col;
             }

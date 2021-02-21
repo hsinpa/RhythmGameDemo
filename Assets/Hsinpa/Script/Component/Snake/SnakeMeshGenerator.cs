@@ -15,11 +15,18 @@ namespace Hsinpa.Snake
 
         public float meshSize = 1f;
 
+        private Dictionary<int, Vector2> UVParternLookupTable = new Dictionary<int, Vector2>();
+
         public SnakeMeshGenerator() {
             vertices = new List<Vector3>();
             triangles = new List<int>();
             uv = new List<Vector2>();
             meshInfo = new Types.MeshInfo();
+
+            UVParternLookupTable.Add(0, new Vector2(0, 0));
+            UVParternLookupTable.Add(1, new Vector2(0, 1));
+            UVParternLookupTable.Add(2, new Vector2(1, 0));
+            UVParternLookupTable.Add(3, new Vector2(1, 1));
         }
 
         public Types.MeshInfo RenderSegments(Snake.SnakePath snakePath, int startSegmentIndex, int endSegmentIndex) {
@@ -118,7 +125,7 @@ namespace Hsinpa.Snake
             //int vLength = vertices.Count;
             for (int i = 0; i < verticesCount; i++)
             {
-                uv.Add(NVector3To2(vertices[i]));
+                uv.Add(NVector3To2(vertices[i], i));
             }
 
             meshInfo.vertices = vertices;
@@ -129,10 +136,16 @@ namespace Hsinpa.Snake
         }
 
         //Vector3 is between -1 to 1, UV should be 0 -1 
-        private Vector2 NVector3To2(Vector3 vector)
+        private Vector2 NVector3To2(Vector3 vector, int index)
         {
-            vector.Normalize();
-            return (vector + Vector3.one) * 0.5f;
+            int newIndex = index % 4;
+
+            if (UVParternLookupTable.TryGetValue(newIndex, out Vector2 uv)) {
+                return uv;
+            }
+
+            return vector;
+           // return (vector + Vector3.one) * 0.5f;
         }
     }
 }
