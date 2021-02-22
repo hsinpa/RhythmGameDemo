@@ -125,7 +125,7 @@ namespace Hsinpa.Snake
             //int vLength = vertices.Count;
             for (int i = 0; i < verticesCount; i++)
             {
-                uv.Add(NVector3To2(vertices[i], i));
+                uv.Add(NVector3To2(vertices[i], i) * 0.5f);
             }
 
             meshInfo.vertices = vertices;
@@ -138,14 +138,11 @@ namespace Hsinpa.Snake
         //Vector3 is between -1 to 1, UV should be 0 -1 
         private Vector2 NVector3To2(Vector3 vector, int index)
         {
-            int newIndex = index % 4;
-
-            if (UVParternLookupTable.TryGetValue(newIndex, out Vector2 uv)) {
-                return uv;
+            if (index < 3) {
+                return new Vector2(vector.x, vector.y);
             }
 
-            return vector;
-           // return (vector + Vector3.one) * 0.5f;
+            return new Vector2(vector.y, vector.z);
         }
     }
 }
