@@ -23,13 +23,12 @@ namespace Hsinpa {
             _nearestSnakeVertexList.Clear();
 
             foreach (SnakePathViewer.NoteStruct node in noteList) {
-                int vertexCount = node.snakeMesh.snakePath.PointCount;
+                int vertexCount = node.snakeMesh.snakeMeshGenerator.midPoints.Count;
 
                 //TODO : Not going to do it here, but it can be optimize by using telophone number finding algorithm.
                 for (int i = 0; i < vertexCount; i++) {
 
-
-                    float worldVertexPos = node.snakeMesh.transform.position.z + node.snakeMesh.snakePath[i].z;
+                    float worldVertexPos = node.snakeMesh.transform.position.z + node.snakeMesh.snakeMeshGenerator.midPoints[i].z;
 
                     float distDiff = Mathf.Abs(_zGoalPosition - worldVertexPos);
 

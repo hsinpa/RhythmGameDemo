@@ -23,6 +23,7 @@ namespace Hsinpa.Snake {
         private Mesh _mesh;
 
         private SnakeMeshGenerator _snakeMeshGenerator;
+        public SnakeMeshGenerator snakeMeshGenerator => _snakeMeshGenerator;
 
         public void SetUp() {
             _snakeMeshGenerator = new SnakeMeshGenerator();

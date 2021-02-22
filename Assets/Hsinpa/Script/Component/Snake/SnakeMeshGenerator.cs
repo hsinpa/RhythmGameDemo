@@ -17,11 +17,15 @@ namespace Hsinpa.Snake
 
         private Dictionary<int, Vector2> UVParternLookupTable = new Dictionary<int, Vector2>();
 
+        private List<Vector3> _midPoints;
+        public List<Vector3> midPoints => _midPoints;
+
         public SnakeMeshGenerator() {
             vertices = new List<Vector3>();
             triangles = new List<int>();
             uv = new List<Vector2>();
             meshInfo = new Types.MeshInfo();
+            _midPoints = new List<Vector3>();
 
             UVParternLookupTable.Add(0, new Vector2(0, 0));
             UVParternLookupTable.Add(1, new Vector2(0, 1));
@@ -33,6 +37,7 @@ namespace Hsinpa.Snake
             vertices.Clear();
             triangles.Clear();
             uv.Clear();
+            _midPoints.Clear();
 
             float SizeDelimitor = 1 * meshSize;
             for (int i = 0; i < snakePath.NumSegments; i++)
@@ -73,6 +78,7 @@ namespace Hsinpa.Snake
                     vertices.Add(topVertice);
                     vertices.Add(rightVertice);
                     vertices.Add(leftVertice);
+                    _midPoints.Add(bezierInfo[k].Position);
                 }
             }
 

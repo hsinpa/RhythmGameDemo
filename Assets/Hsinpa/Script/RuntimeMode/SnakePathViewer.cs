@@ -21,7 +21,7 @@ namespace Hsinpa {
         private SnakeMesh snakePrefab;
 
         [SerializeField, Range(0, 1f)]
-        private float ScoreThredshold = 0.5f;
+        private float ScoreThredshold = 0.4f;
 
         private SnakePathScorer snakePathScorer;
 
@@ -48,6 +48,7 @@ namespace Hsinpa {
 
         private float deltaTime = 0.02f;
         private Vector3 cameraPosition;
+        private TouchStruct touchPoint = new TouchStruct();
 
         public void Start()
         {
@@ -103,24 +104,32 @@ namespace Hsinpa {
 
             snakePathScorer.OnUpdate(noteList);
 
-            //ProcessNoteMovement();
+            ProcessNoteMovement();
         }
 
-        public void OnMouseClick(UnityEngine.Ray rayStruct)
+        public TouchStruct OnMouseClick(UnityEngine.Ray rayStruct)
         {
+            touchPoint.isValid = false;
 
             foreach (SnakePathScorer.CurrentSnakeVertex currentSnakeVertex in snakePathScorer.nearestSnakeVertexList)
             {
-                Vector3 worldPos = currentSnakeVertex.noteStruct.snakeMesh.transform.position + currentSnakeVertex.noteStruct.snakeMesh.snakePath[currentSnakeVertex.index];
+                Vector3 worldPos = currentSnakeVertex.noteStruct.snakeMesh.transform.position + currentSnakeVertex.noteStruct.snakeMesh.snakeMeshGenerator.midPoints[currentSnakeVertex.index];
                 float distance = (rayStruct.origin - worldPos).magnitude;
                 Vector3 raycastPos = rayStruct.origin + (rayStruct.direction * distance);
                 float similarity = Vector3.Distance(worldPos, raycastPos);
 
                 bool isAccept = similarity < ScoreThredshold;
 
-                Debug.Log($"similarity {similarity}, isAccept {isAccept}");
+                if (isAccept) {
+                    touchPoint.isValid = true;
+                    touchPoint.touchPoint = worldPos;
+                    touchPoint.component = currentSnakeVertex.noteStruct.component;
+
+                    return touchPoint;
+                }
             }
 
+            return touchPoint;
         }
 
         private void ProcessNote(int index) {
@@ -183,6 +192,13 @@ namespace Hsinpa {
             public SnakeMesh snakeMesh;
             public Types.LevelComponent component;
             public float velocity;
+        }
+
+        public struct TouchStruct
+        {
+            public Vector3 touchPoint;
+            public Types.LevelComponent component;
+            public bool isValid;
         }
     }
 }
