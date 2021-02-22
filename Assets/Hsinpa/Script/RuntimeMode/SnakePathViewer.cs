@@ -20,6 +20,11 @@ namespace Hsinpa {
         [SerializeField]
         private SnakeMesh snakePrefab;
 
+        [SerializeField, Range(0, 1f)]
+        private float ScoreThredshold = 0.5f;
+
+        private SnakePathScorer snakePathScorer;
+
         private Types.LevelJSON levelJSON;
         private float startTime;
         private float currentTime;
@@ -42,12 +47,16 @@ namespace Hsinpa {
         private float distance;
 
         private float deltaTime = 0.02f;
+        private Vector3 cameraPosition;
 
         public void Start()
         {
             deltaTime = Time.deltaTime;
+            snakePathScorer = new SnakePathScorer(0, ScoreThredshold);
             NoteActionTable = RegisterNoteTable();
             noteIndex = -1;
+
+            cameraPosition = Camera.main.transform.position;
 
             PlaySnakeView();
         }
@@ -92,7 +101,26 @@ namespace Hsinpa {
                 doneProcessing = !noteAvailable;
             }
 
-            ProcessNoteMovement();
+            snakePathScorer.OnUpdate(noteList);
+
+            //ProcessNoteMovement();
+        }
+
+        public void OnMouseClick(UnityEngine.Ray rayStruct)
+        {
+
+            foreach (SnakePathScorer.CurrentSnakeVertex currentSnakeVertex in snakePathScorer.nearestSnakeVertexList)
+            {
+                Vector3 worldPos = currentSnakeVertex.noteStruct.snakeMesh.transform.position + currentSnakeVertex.noteStruct.snakeMesh.snakePath[currentSnakeVertex.index];
+                float distance = (rayStruct.origin - worldPos).magnitude;
+                Vector3 raycastPos = rayStruct.origin + (rayStruct.direction * distance);
+                float similarity = Vector3.Distance(worldPos, raycastPos);
+
+                bool isAccept = similarity < ScoreThredshold;
+
+                Debug.Log($"similarity {similarity}, isAccept {isAccept}");
+            }
+
         }
 
         private void ProcessNote(int index) {
@@ -151,7 +179,7 @@ namespace Hsinpa {
             return (levelJSON.sequence[index].time < (currentTime + noteTime));
         }
 
-        private struct NoteStruct {
+        public struct NoteStruct {
             public SnakeMesh snakeMesh;
             public Types.LevelComponent component;
             public float velocity;

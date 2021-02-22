@@ -6,6 +6,9 @@ namespace Hsinpa.InputSystem {
     public class InputManager : MonoBehaviour
     {
 
+        [SerializeField]
+        private SnakePathViewer snakePathViewer;
+
         Camera _camera;
 
         private void Start()
@@ -16,7 +19,7 @@ namespace Hsinpa.InputSystem {
         private void Update()
         {
 
-            if (Input.GetMouseButtonDown(0)) {
+            if (Input.GetMouseButton(0)) {
                 OnScreenTouch(Input.mousePosition);
             }
 
@@ -25,7 +28,9 @@ namespace Hsinpa.InputSystem {
         private void OnScreenTouch(Vector2 screenPos) {
             Ray ray = _camera.ScreenPointToRay(screenPos);
 
-            Debug.Log($"Screen {screenPos}, Origin {ray.origin}, Direction {ray.direction}");
+            snakePathViewer.OnMouseClick(ray);
+
+            //Debug.Log($"Screen {screenPos}, Origin {ray.origin}, Direction {ray.direction}");
         }
 
     }
