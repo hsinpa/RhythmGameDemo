@@ -1,23 +1,37 @@
 {
 	"bpm" : 120,
-	"sequence" : [
+	"sequence": [
 		{
-			"type" : "speed",
-			"time" : 0,
-			"value" : "1"
+			"type": "speed",
+			"time": 0,
+			"value": "1"
 		},
 
 		{
-			"type" : "snake",
-			"time" : 2.5,
-			"value" : "Data_01"
+			"type": "snake",
+			"time": 2.5,
+			"value": "Data_01"
 		},
 
 		{
-			"type" : "snake",
-			"time" : 2.5,
-			"value" : "Data_02"
+			"type": "snake",
+			"time": 2.5,
+			"value": "Data_02"
+		},
+
+
+		{
+			"type": "speed",
+			"time": 3.5,
+			"value": "0"
+		},
+
+		{
+			"type": "speed",
+			"time": 5,
+			"value": "0.5"
 		}
+
 	]
 	
 }

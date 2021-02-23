@@ -318,7 +318,19 @@ namespace Hsinpa.Creator
             int pointCount = copyPath.PointCount;
             for (int i = 0; i < pointCount; i++)
             {
-                emptySnakepath.Push(HUtil.SnakeUtility.VectorMulti(copyPath[i], revertDirection));
+
+                float yOffset = creator.YAxisConstraints.y - copyPath[i].y;
+                float revertYPos = creator.YAxisConstraints.x + yOffset;
+
+                float xOffset = creator.XAxisConstraints.y - copyPath[i].x;
+                float revertXPos = creator.XAxisConstraints.x + xOffset;
+
+                var revertPath = new Vector3( (revertDirection.x == -1) ? revertXPos : copyPath[i].x,
+                                (revertDirection.y == -1) ? revertYPos : copyPath[i].y,
+                                copyPath[i].z
+                    );
+
+                emptySnakepath.Push(revertPath);
             }
 
             var snakeCreator = GUtil.UtilityMethod.CreateObjectToParent<SnakePathCreator>(creator.transform.parent, creator.transform.gameObject);

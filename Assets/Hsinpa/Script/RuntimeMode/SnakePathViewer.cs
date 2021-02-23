@@ -43,7 +43,9 @@ namespace Hsinpa {
         private float default_distance = 18;
 
         private int bpm = 1;
-        private float user_speed = 0;
+        private float user_speed = 1;
+        private float system_speed = 1;
+        private float speed => user_speed * system_speed;
         private float distance;
 
         private float deltaTime = 0.02f;
@@ -104,6 +106,10 @@ namespace Hsinpa {
 
             snakePathScorer.OnUpdate(noteList);
 
+        }
+
+        private void FixedUpdate()
+        {
             ProcessNoteMovement();
         }
 
@@ -146,13 +152,15 @@ namespace Hsinpa {
             Vector3 velocity3D = Vector3.zero;
 
             for (int i = 0; i < noteLength; i++) {
-                velocity3D.z = -noteList[i].velocity;
+                velocity3D.z = -noteList[i].velocity * speed;
                 noteList[i].snakeMesh.transform.Translate(velocity3D);
             }
         }
 
         private void ProcessSpeedNote(Types.LevelComponent component) {
             Debug.Log($"Type {component.type}, Time {component.time}, Value {component.value}");
+
+            system_speed = float.Parse(component.value);
         }
 
         private void ProcessSnakeNote(Types.LevelComponent component) {
