@@ -15,6 +15,8 @@ namespace Hsinpa.Snake {
 
         private List<Types.BezierSegmentInfo> _cacheSegmentInfoArray = new List<Types.BezierSegmentInfo>();
 
+        public Types.SnakeTag tag;        
+
         [SerializeField]
         private List<Vector3> Points = new List<Vector3>();
 

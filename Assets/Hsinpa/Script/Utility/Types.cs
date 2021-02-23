@@ -51,5 +51,21 @@ namespace Hsinpa {
         public enum SnakePathType {
             Point, ControlPoint
         }
+
+        public enum SnakeTag { 
+            Blue, Red
+        }
+
+        public static Color GetColorBySnakeTag(SnakeTag p_tag) {
+            switch (p_tag) {
+                case SnakeTag.Blue:
+                    return EventFlag.ColorSet.Blue;
+
+                case SnakeTag.Red:
+                    return EventFlag.ColorSet.Red;
+            }
+
+            return Color.white;
+        }
     }
 }

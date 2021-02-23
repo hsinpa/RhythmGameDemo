@@ -13,4 +13,13 @@ public class EventFlag
         public const string SnakePathSRPFolder = "Assets/Hsinpa/PathSRPData/";
     }
 
+    public class ColorSet {
+        public readonly static Color Red = new Color32(255, 102, 88, 255);
+        public readonly static Color Blue = new Color32(88, 248, 255, 255);
+    }
+    public class SnakeShaderVar
+    {
+        public const string Color = "_Color";
+    }
+
 }

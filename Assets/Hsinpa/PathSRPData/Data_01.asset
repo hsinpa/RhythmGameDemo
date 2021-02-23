@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ee7ec2f7ad5f43898b9f6d8d5b42b4b, type: 3}
   m_Name: Data_01
   m_EditorClassIdentifier: 
+  tag: 1
   Points:
   - {x: 0, y: 2, z: -5.79629}
   - {x: -0.0058603287, y: 2.4906697, z: -3.5294921}

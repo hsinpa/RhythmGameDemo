@@ -21,6 +21,8 @@ namespace Hsinpa.Snake {
         public float meshSize = 1f;
 
         private Mesh _mesh;
+        private Material _material;
+        private MaterialPropertyBlock m_PropertyBlock;
 
         private SnakeMeshGenerator _snakeMeshGenerator;
         public SnakeMeshGenerator snakeMeshGenerator => _snakeMeshGenerator;
@@ -28,10 +30,15 @@ namespace Hsinpa.Snake {
         public void SetUp() {
             _snakeMeshGenerator = new SnakeMeshGenerator();
             InitMeshIfNeeded();
+            m_PropertyBlock = new MaterialPropertyBlock();
+            _material = _meshRenderer.material;
         }
 
         public void SetSnakePath(SnakePath p_snakePath) {
             this._snakePath = p_snakePath;
+
+            m_PropertyBlock.SetColor(EventFlag.SnakeShaderVar.Color, Types.GetColorBySnakeTag(p_snakePath.tag));
+            _meshRenderer.SetPropertyBlock(m_PropertyBlock);
         }
 
         public void RenderMesh()

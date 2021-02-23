@@ -6,6 +6,9 @@
 
         //X = Point to hide, Y = Point to appear; Ignore other two
         _Constraint("Constraint", Vector) = (0.0, 0.0, 0.0, 0.0)
+
+        _Color("Color", Color) = (0, 0, 0, 1)
+
     }
     SubShader
     {
@@ -41,6 +44,7 @@
 
             sampler2D _MainTex;
             float4 _MainTex_ST;
+            float4 _Color;
             uniform float4 _Constraint;
 
             v2f vert (appdata v)
@@ -61,7 +65,7 @@
             {
                 fixed4 col = tex2D(_MainTex, i.uv);
                 
-                col = col * i.lightStrength;
+                col = col * i.lightStrength * _Color;
 
                 if (i.worldPos.z <= _Constraint.y && i.worldPos.z >= _Constraint.x)
                     col.a = 1;
