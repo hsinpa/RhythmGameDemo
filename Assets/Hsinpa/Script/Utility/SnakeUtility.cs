@@ -45,5 +45,10 @@ namespace Hsinpa.Utility {
             return vector_a;
         }
 
+        public static Vector3 VectorMulti(Vector3 vector_a, Vector3 vector_b)
+        {
+            return new Vector3(vector_a.x * vector_b.x, vector_a.y * vector_b.y, vector_a.z * vector_b.z);
+        }
+
     }
 }

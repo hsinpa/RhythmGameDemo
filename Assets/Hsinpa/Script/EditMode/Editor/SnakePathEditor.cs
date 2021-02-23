@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using Hsinpa.Snake;
-using Hsinpa.Utility;
-
-using UnityEngine.SceneManagement;
+using HUtil = Hsinpa.Utility;
+using GUtil = Utility;
 using System;
 
 namespace Hsinpa.Creator
@@ -16,12 +14,9 @@ namespace Hsinpa.Creator
     {
         SnakePathCreator creator;
         Vector3 parentPos => creator.transform.position;
-        Tool LastTool = Tool.None;
-
 
         Vector3 _snap = Vector3.one * 0.5f;
         float minBezierDistThreshold = 0.2f;
-
 
         Types.BezierSegmentInfo lastBezierSegmentInfo;
 
@@ -42,6 +37,19 @@ namespace Hsinpa.Creator
             {
                 myScript.RenderPathLayoutToMesh();
             }
+
+            GUILayout.BeginHorizontal();
+
+            if (GUILayout.Button("Revert", GUILayout.ExpandWidth(true)))
+                RevertSnakePath(new Vector3(-1, -1, 1), creator.snakePath);
+
+            if (GUILayout.Button("Revert Y", GUILayout.ExpandWidth(true)))
+                RevertSnakePath(new Vector3(1, -1, 1), creator.snakePath);
+
+            if (GUILayout.Button("Revert X", GUILayout.ExpandWidth(true)))
+                RevertSnakePath(new Vector3(-1, 1, 1), creator.snakePath);
+
+            GUILayout.EndHorizontal();
 
             bool isEnableAutoCtrlP = GUILayout.Toggle(creator.enableAutoContorlPoint, "Enable Auto Ctrl Point");
             if (isEnableAutoCtrlP != creator.enableAutoContorlPoint) {
@@ -215,7 +223,7 @@ namespace Hsinpa.Creator
 
                 for (float t = 0.1f; t < 1; t += 0.1f)
                 {
-                    Vector3 bezierCurveDot = SnakeUtility.BezierCurve(points[0], points[1], points[2], points[3], t);
+                    Vector3 bezierCurveDot = HUtil.SnakeUtility.BezierCurve(points[0], points[1], points[2], points[3], t);
                     float distToCamera = (bezierCurveDot - mousePos).magnitude;
                     Vector3 simulateMousePoint = mousePos + (distToCamera * mouseDir);
 
@@ -299,19 +307,31 @@ namespace Hsinpa.Creator
             return mousePos + (lastAnchorPoint);
         }
 
+        /// <summary>
+        /// Copy the snake path data and revert it
+        /// </summary>
+        private void RevertSnakePath(Vector3 revertDirection, SnakePath copyPath) {
+            SnakePath emptySnakepath = ScriptableObject.CreateInstance<SnakePath>();
+            string fileName = copyPath.name + "_Clone.asset";
+            AssetDatabase.CreateAsset(emptySnakepath, EventFlag.Path.SnakePathSRPFolder + fileName);
+
+            int pointCount = copyPath.PointCount;
+            for (int i = 0; i < pointCount; i++)
+            {
+                emptySnakepath.Push(HUtil.SnakeUtility.VectorMulti(copyPath[i], revertDirection));
+            }
+
+            var snakeCreator = GUtil.UtilityMethod.CreateObjectToParent<SnakePathCreator>(creator.transform.parent, creator.transform.gameObject);
+            snakeCreator.transform.position = creator.transform.position;
+            snakeCreator.SetSnakePath(emptySnakepath);
+
+            AssetDatabase.SaveAssets();
+        }
+
         void OnEnable()
         {
             creator = (SnakePathCreator)target;
             lastBezierSegmentInfo = new Types.BezierSegmentInfo();
-
-            //LastTool = Tools.current;
-            //Tools.current = Tool.None;
-        }
-
-
-        void OnDisable()
-        {
-            //Tools.current = LastTool;
         }
 
     }

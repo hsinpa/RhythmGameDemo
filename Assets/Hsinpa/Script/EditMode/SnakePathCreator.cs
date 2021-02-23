@@ -25,6 +25,8 @@ namespace Hsinpa.Creator {
 
         public SnakePath snakePath => _snakePath;
 
+        public SnakeMesh snakeMeshPrefab;
+
         [SerializeField]
         private SnakeMesh _snakeMesh;
 
@@ -81,6 +83,12 @@ namespace Hsinpa.Creator {
             _snakeMesh.RenderMesh();
         }
 
+        public void SetSnakePath(SnakePath snakePath) {
+            if (_snakeMesh == null) return;
+            _snakePath = snakePath;
+
+            RenderPathLayoutToMesh();
+        }
 
 
     }

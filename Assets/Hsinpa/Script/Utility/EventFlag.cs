@@ -9,4 +9,8 @@ public class EventFlag
         public const string SpeedType = "speed";
     }
 
+    public class Path {
+        public const string SnakePathSRPFolder = "Assets/Hsinpa/PathSRPData/";
+    }
+
 }
