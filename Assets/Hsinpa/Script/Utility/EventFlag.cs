@@ -20,6 +20,7 @@ public class EventFlag
     public class SnakeShaderVar
     {
         public const string Color = "_Color";
+        public const string DisplayContraint = "_UseDisplayContraint";
     }
 
 }

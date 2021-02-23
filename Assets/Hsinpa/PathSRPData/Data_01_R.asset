@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ee7ec2f7ad5f43898b9f6d8d5b42b4b, type: 3}
+  m_Name: Data_01_R
+  m_EditorClassIdentifier: 
+  tag: 1
+  Points:
+  - {x: 0.16324556, y: 0.92089844, z: -3.0910392}
+  - {x: 0.97332036, y: 1.3431572, z: -2.4459865}
+  - {x: 1.0971122, y: 1.9052291, z: -1.7973343}
+  - {x: 1.1617969, y: 1.8258277, z: -0.6490841}
+  - {x: 1.2311329, y: 1.740717, z: 0.58173084}
+  - {x: -0.29521596, y: 0.5770912, z: 0.5535412}
+  - {x: -0.26007807, y: 0.59955215, z: 2.0353413}
+  - {x: -0.22504584, y: 0.62194556, z: 3.5126853}
+  - {x: 0.8448675, y: 1.5254741, z: 2.8061762}
+  - {x: 1.0270313, y: 1.5719228, z: 4.3181357}
+  - {x: 1.1139454, y: 1.5940844, z: 5.0395226}
+  - {x: 1.0061656, y: 1.1943359, z: 5.546574}
+  - {x: -0.15999544, y: 0.6748047, z: 5.714648}

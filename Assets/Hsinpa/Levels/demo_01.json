@@ -10,28 +10,62 @@
 		{
 			"type": "snake",
 			"time": 2.5,
-			"value": "Data_01"
+			"value": "Data_01_B"
 		},
 
 		{
 			"type": "snake",
 			"time": 2.5,
-			"value": "Data_02"
+			"value": "Data_01_R"
 		},
 
+		{
+			"type": "snake",
+			"time": 5,
+			"value": "Data_02_B"
+		},
+
+		{
+			"type": "snake",
+			"time": 6,
+			"value": "Data_02_R"
+		},
 
 		{
 			"type": "speed",
-			"time": 3.5,
+			"time": 6.5,
 			"value": "0"
 		},
 
 		{
 			"type": "speed",
-			"time": 5,
+			"time": 8,
+			"value": "1"
+		},
+
+		{
+			"type": "speed",
+			"time": 9,
 			"value": "0.5"
+		},
+
+		{
+			"type": "snake",
+			"time": 10,
+			"value": "Data_03_B"
+		},
+
+		{
+			"type": "snake",
+			"time": 10,
+			"value": "Data_03_R"
+		},
+
+		{
+			"type": "speed",
+			"time": 11,
+			"value": "1"
 		}
 
 	]
-	
 }

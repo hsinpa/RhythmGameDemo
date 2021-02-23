@@ -31,13 +31,15 @@ namespace Hsinpa.Snake {
             _snakeMeshGenerator = new SnakeMeshGenerator();
             InitMeshIfNeeded();
             m_PropertyBlock = new MaterialPropertyBlock();
-            _material = _meshRenderer.material;
+            _material = _meshRenderer.sharedMaterial;
         }
 
-        public void SetSnakePath(SnakePath p_snakePath) {
+        public void SetSnakePath(SnakePath p_snakePath, bool display) {
             this._snakePath = p_snakePath;
 
             m_PropertyBlock.SetColor(EventFlag.SnakeShaderVar.Color, Types.GetColorBySnakeTag(p_snakePath.tag));
+            m_PropertyBlock.SetFloat(EventFlag.SnakeShaderVar.DisplayContraint, (display) ? 0 : 1);
+
             _meshRenderer.SetPropertyBlock(m_PropertyBlock);
         }
 

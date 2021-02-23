@@ -181,10 +181,10 @@ namespace Hsinpa {
 
             if (snakePathData != null) {
                 spawnEmptySnake.SetUp();
-                spawnEmptySnake.SetSnakePath(snakePathData);
+                spawnEmptySnake.SetSnakePath(snakePathData, false);
                 spawnEmptySnake.RenderMesh();
 
-                spawnEmptySnake.transform.position = new Vector3(0, -0.8f, default_distance - snakePathData[0].z);
+                spawnEmptySnake.transform.position = new Vector3(snakePathData.OffsetPosition.x, -0.8f, default_distance - snakePathData[0].z);
             }
 
             return spawnEmptySnake;

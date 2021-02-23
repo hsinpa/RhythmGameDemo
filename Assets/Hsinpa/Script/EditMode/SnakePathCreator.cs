@@ -5,6 +5,7 @@ using Hsinpa.Snake;
 using UnityEngine.Rendering.UI;
 
 namespace Hsinpa.Creator {
+    [ExecuteInEditMode]
     public class SnakePathCreator : MonoBehaviour
     {
         [SerializeField]
@@ -33,6 +34,11 @@ namespace Hsinpa.Creator {
         public Vector2 XAxisConstraints;
 
         public Vector2 YAxisConstraints;
+
+        private void Start()
+        {
+            RenderPathLayoutToMesh();
+        }
 
         public void CreateBasicPathSetup() {
             // _snakePath = new SnakePath();
@@ -78,7 +84,7 @@ namespace Hsinpa.Creator {
             
             _snakeMesh.SetUp();
 
-            _snakeMesh.SetSnakePath(snakePath);
+            _snakeMesh.SetSnakePath(snakePath, true);
 
             _snakeMesh.RenderMesh();
         }
@@ -89,7 +95,6 @@ namespace Hsinpa.Creator {
 
             RenderPathLayoutToMesh();
         }
-
 
     }
 }

@@ -20,6 +20,8 @@ namespace Hsinpa.Snake {
         [SerializeField]
         private List<Vector3> Points = new List<Vector3>();
 
+        public Vector2 OffsetPosition = Vector2.zero;
+
         public Vector3 this[int i]
         {
             get

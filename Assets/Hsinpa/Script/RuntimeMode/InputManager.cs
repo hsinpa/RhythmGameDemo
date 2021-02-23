@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace Hsinpa.InputSystem {
     public class InputManager : MonoBehaviour
@@ -10,7 +11,9 @@ namespace Hsinpa.InputSystem {
         private SnakePathViewer snakePathViewer;
 
         [SerializeField]
-        private MeshRenderer[] touchIndicators;
+        private InputTouchPoint[] TouchPointArray;
+
+        private float indicatorReserveTime = 0.1f;
 
         Camera _camera;
 
@@ -21,9 +24,12 @@ namespace Hsinpa.InputSystem {
 
         private void Update()
         {
-            foreach (MeshRenderer meshRenderer in touchIndicators)
+            foreach (InputTouchPoint touchPoint in TouchPointArray)
             {
-                meshRenderer.enabled = false;
+                if (touchPoint.lastEnableTime < Time.time) {
+                    touchPoint.meshRenderer.enabled = false;
+                    touchPoint.touchID = -1;
+                }
             }
 
             if (Input.GetMouseButton(0)) {
@@ -34,24 +40,37 @@ namespace Hsinpa.InputSystem {
         private void OnScreenTouch(Vector2 screenPos) {
             Ray ray = _camera.ScreenPointToRay(screenPos);
 
-            var onClickResult =  snakePathViewer.OnMouseClick(ray);
+            var onClickResult = snakePathViewer.OnMouseClick(ray);
 
             if (onClickResult.isValid) {
-                MeshRenderer tIndicator = GetAvailableTouchIndicator();
+                InputTouchPoint tIndicator = GetAvailableTouchIndicator(touchID : 0);
 
                 if (tIndicator != null) {
-                    tIndicator.enabled = true;
-                    tIndicator.transform.position = onClickResult.touchPoint;
+                    tIndicator.meshRenderer.enabled = true;
+
+                    if (tIndicator.touchID == -1)
+                        tIndicator.transform.position = onClickResult.touchPoint;
+                    else
+                        tIndicator.transform.position = Vector3.Lerp(tIndicator.transform.position, onClickResult.touchPoint, 0.2f);
+
+                    tIndicator.touchID = 0;
+
+                    tIndicator.lastEnableTime = Time.time + indicatorReserveTime;
                 }
             }
 
             //Debug.Log($"Screen {screenPos}, Origin {ray.origin}, Direction {ray.direction}");
         }
 
-        private MeshRenderer GetAvailableTouchIndicator() {
-            foreach (MeshRenderer meshRenderer in touchIndicators) {
-                if (!meshRenderer.enabled)
-                    return meshRenderer;
+        private InputTouchPoint GetAvailableTouchIndicator(int touchID) {
+            foreach (InputTouchPoint touchPoint in TouchPointArray) {
+
+                if (touchPoint.touchID == touchID && touchPoint.meshRenderer.enabled) {
+                    return touchPoint;
+                }
+
+                if (!touchPoint.meshRenderer.enabled)
+                    return touchPoint;
             }
 
             return null;

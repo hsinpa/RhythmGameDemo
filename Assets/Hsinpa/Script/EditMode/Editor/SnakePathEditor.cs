@@ -134,6 +134,8 @@ namespace Hsinpa.Creator
 
             if (creator.snakePath != null) {
 
+                creator.snakePath.OffsetPosition = creator.transform.position;
+
                 for (int i = 0; i < creator.snakePath.NumSegments; i++)
                 {
                     Vector3[] points = creator.snakePath.GetPointsInSegment(i);
@@ -164,10 +166,12 @@ namespace Hsinpa.Creator
 
                     Vector3 worldPos = ConvertToWorldPos(creator.snakePath[i]);
                     Vector3 newPos = Handles.FreeMoveHandle(worldPos, Quaternion.identity, .2f, _snap, Handles.CylinderHandleCap);
+
                     Vector3 LocalPos = ConvertToLocalPos(newPos);
 
                     if (isAnchorP)
                         LocalPos = ClampPositionToConstraint(LocalPos);
+
 
                     //Move Anchor Around
                     if (creator.snakePath[i] != LocalPos && (!creator.enableAutoContorlPoint || ((creator.enableAutoContorlPoint && isAnchorP) ||
@@ -344,7 +348,9 @@ namespace Hsinpa.Creator
         {
             creator = (SnakePathCreator)target;
             lastBezierSegmentInfo = new Types.BezierSegmentInfo();
-        }
 
+            if (creator.snakePath != null)
+                creator.snakePath.OffsetPosition = creator.transform.position;
+        }
     }
 }

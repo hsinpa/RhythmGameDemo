@@ -9,6 +9,8 @@
 
         _Color("Color", Color) = (0, 0, 0, 1)
 
+		[Toggle(USE_DISPLAY_CONSTRAINT)] _UseDisplayContraint("Use Display Constraint", Float) = 0
+
     }
     SubShader
     {
@@ -45,6 +47,7 @@
             sampler2D _MainTex;
             float4 _MainTex_ST;
             float4 _Color;
+            float _UseDisplayContraint;
             uniform float4 _Constraint;
 
             v2f vert (appdata v)
@@ -67,10 +70,12 @@
                 
                 col = col * i.lightStrength * _Color;
 
-                if (i.worldPos.z <= _Constraint.y && i.worldPos.z >= _Constraint.x)
-                    col.a = 1;
-                else
-                    discard;
+                if (_UseDisplayContraint == 1) {
+                    if (i.worldPos.z <= _Constraint.y && i.worldPos.z >= _Constraint.x)
+                        col.a = 1;
+                    else
+                        discard;                
+                }
 
 
                 return col;
