@@ -8,4 +8,6 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Hsinpa/Scenes/RuntimeScene.unity
     guid: 61d6dd24192fc0545be6dad62bc0d579
-  m_configObjects: {}
+  m_configObjects:
+    com.unity.input.settings: {fileID: 11400000, guid: d099d37aef431d248a5a3530d8e21a68,
+      type: 2}

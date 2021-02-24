@@ -33,37 +33,61 @@
 
 		{
 			"type": "speed",
-			"time": 6.5,
+			"time": 8.0,
 			"value": "0"
 		},
 
 		{
 			"type": "speed",
-			"time": 8,
-			"value": "1"
-		},
-
-		{
-			"type": "speed",
-			"time": 9,
+			"time": 10,
 			"value": "0.5"
 		},
 
 		{
 			"type": "snake",
-			"time": 10,
+			"time": 15,
 			"value": "Data_03_B"
 		},
 
 		{
 			"type": "snake",
-			"time": 10,
+			"time": 15,
 			"value": "Data_03_R"
 		},
 
 		{
 			"type": "speed",
-			"time": 11,
+			"time": 17,
+			"value": "1"
+		},
+
+		{
+			"type": "snake",
+			"time": 20,
+			"value": "Data_04_B"
+		},
+
+		{
+			"type": "snake",
+			"time": 20,
+			"value": "Data_04_R"
+		},
+
+		{
+			"type": "speed",
+			"time": 23,
+			"value": "0"
+		},
+
+		{
+			"type": "speed",
+			"time": 24,
+			"value": "-1"
+		},
+
+		{
+			"type": "speed",
+			"time": 25,
 			"value": "1"
 		}
 

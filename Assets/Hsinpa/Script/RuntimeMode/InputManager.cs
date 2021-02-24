@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -14,12 +15,13 @@ namespace Hsinpa.InputSystem {
         private InputTouchPoint[] TouchPointArray;
 
         private float indicatorReserveTime = 0.1f;
-
-        Camera _camera;
+        private InputTouchWrapper _inputTouchWrapper;
+        private Camera _camera;
 
         private void Start()
         {
             _camera = Camera.main;
+            _inputTouchWrapper = new InputTouchWrapper();
         }
 
         private void Update()
@@ -32,18 +34,21 @@ namespace Hsinpa.InputSystem {
                 }
             }
 
-            if (Input.GetMouseButton(0)) {
-                OnScreenTouch(Input.mousePosition);
+            InputTouchWrapper.TouchInfo[] touchInfoArray = _inputTouchWrapper.HasTouch();
+            int touchCount = touchInfoArray.Length;
+            for (int i = 0; i < touchCount; i++) {
+                if (touchInfoArray[i].isValid)
+                    OnScreenTouch(touchInfoArray[i].touchScreenPosition, touchInfoArray[i].touchId);
             }
         }
 
-        private void OnScreenTouch(Vector2 screenPos) {
+        private void OnScreenTouch(Vector2 screenPos, int touchID) {
             Ray ray = _camera.ScreenPointToRay(screenPos);
 
             var onClickResult = snakePathViewer.OnMouseClick(ray);
 
             if (onClickResult.isValid) {
-                InputTouchPoint tIndicator = GetAvailableTouchIndicator(touchID : 0);
+                InputTouchPoint tIndicator = GetAvailableTouchIndicator(touchID: touchID);
 
                 if (tIndicator != null) {
                     tIndicator.meshRenderer.enabled = true;
@@ -53,7 +58,7 @@ namespace Hsinpa.InputSystem {
                     else
                         tIndicator.transform.position = Vector3.Lerp(tIndicator.transform.position, onClickResult.touchPoint, 0.2f);
 
-                    tIndicator.touchID = 0;
+                    tIndicator.touchID = touchID;
 
                     tIndicator.lastEnableTime = Time.time + indicatorReserveTime;
                 }

@@ -21,7 +21,7 @@ namespace Hsinpa {
         private SnakeMesh snakePrefab;
 
         [SerializeField, Range(0, 1f)]
-        private float ScoreThredshold = 0.4f;
+        private float ScoreThredshold = 0.5f;
 
         private SnakePathScorer snakePathScorer;
 
