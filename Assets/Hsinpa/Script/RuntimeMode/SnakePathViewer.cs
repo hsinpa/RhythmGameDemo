@@ -39,7 +39,7 @@ namespace Hsinpa {
 
         private List<NoteStruct> noteList = new List<NoteStruct>();
 
-        private float default_time = 2f;
+        private float default_time = 4f;
         private float default_distance = 18;
 
         private int bpm = 1;

@@ -349,8 +349,10 @@ namespace Hsinpa.Creator
             creator = (SnakePathCreator)target;
             lastBezierSegmentInfo = new Types.BezierSegmentInfo();
 
-            if (creator.snakePath != null)
+            if (creator.snakePath != null) {
                 creator.snakePath.OffsetPosition = creator.transform.position;
+                EditorUtility.SetDirty(creator.snakePath);
+            }
         }
     }
 }
